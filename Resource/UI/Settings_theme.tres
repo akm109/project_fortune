@@ -1,0 +1,9 @@
+[gd_resource type="Theme" format=3 uid="uid://bd0k88vcwcg37"]
+
+[resource]
+Button/font_sizes/font_size = 40
+HSlider/icons/grabber = null
+Label/font_sizes/font_size = 40
+OptionButton/font_sizes/font_size = 40
+TabBar/font_sizes/font_size = 40
+TabContainer/font_sizes/font_size = 40

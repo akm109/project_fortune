@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=3 uid="uid://cc8tw7s2nevni"]
+
+[ext_resource type="Texture2D" uid="uid://c770tfnb7af1y" path="res://Image/World/Sudoku.png" id="1_ppqyj"]
+[ext_resource type="Script" uid="uid://6we6wnna4gnn" path="res://Script/World/sudoku_container.gd" id="2_vsxe6"]
+
+[node name="OrdinarySudoku" type="TextureRect"]
+anchors_preset = -1
+anchor_right = 0.562
+anchor_bottom = 1.0
+offset_right = 0.959961
+texture = ExtResource("1_ppqyj")
+stretch_mode = 4
+metadata/_edit_use_anchors_ = true
+
+[node name="SudokuContainer" type="GridContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.00437037
+anchor_top = 0.00437037
+anchor_right = 0.99537
+anchor_bottom = 0.99537
+offset_left = 0.28
+offset_top = 0.28
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 0
+columns = 3
+script = ExtResource("2_vsxe6")
+metadata/_edit_use_anchors_ = true

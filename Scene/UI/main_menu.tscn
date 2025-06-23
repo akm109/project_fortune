@@ -1,0 +1,80 @@
+[gd_scene load_steps=8 format=3 uid="uid://cvg0ytmp2j1w4"]
+
+[ext_resource type="Script" uid="uid://b2g1k866u456j" path="res://Script/UI/main_menu.gd" id="1_coj2p"]
+[ext_resource type="StyleBox" uid="uid://cjlvcr0sk08qf" path="res://Resource/UI/new_style_box_flat.tres" id="1_xi6d4"]
+[ext_resource type="Theme" uid="uid://dsi46j046vfv3" path="res://Resource/UI/MainMenuTheme.tres" id="2_6i1m0"]
+[ext_resource type="PackedScene" uid="uid://l0t8tssfplmj" path="res://Scene/UI/settings_menu.tscn" id="4_68aio"]
+
+[sub_resource type="Gradient" id="Gradient_podtv"]
+offsets = PackedFloat32Array(0.0519481, 0.409091, 0.707792, 0.844156, 0.987013)
+colors = PackedColorArray(1, 1, 0, 1, 0.27, 0.5255, 1, 1, 0.309565, 0.427977, 0.734609, 1, 0.4, 0.205067, 0.128, 1, 0.09, 0, 0.0795, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_wmicv"]
+gradient = SubResource("Gradient_podtv")
+width = 192
+height = 108
+fill = 1
+fill_to = Vector2(0.981651, 1)
+
+[sub_resource type="Theme" id="Theme_c5sob"]
+Button/styles/disabled_mirrored = ExtResource("1_xi6d4")
+Button/styles/focus = ExtResource("1_xi6d4")
+Button/styles/pressed = null
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_coj2p")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_wmicv")
+
+[node name="Menu" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -23.5
+offset_top = -21.5
+offset_right = 23.5
+offset_bottom = 21.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_6i1m0")
+
+[node name="PlayButton" type="Button" parent="Menu"]
+layout_mode = 2
+size_flags_vertical = 6
+theme = SubResource("Theme_c5sob")
+text = "PLAY"
+
+[node name="SettingsButton" type="Button" parent="Menu"]
+layout_mode = 2
+text = "SETTING
+"
+
+[node name="ExitButton" type="Button" parent="Menu"]
+layout_mode = 2
+size_flags_vertical = 2
+text = "EXIT"
+
+[node name="SettingsMenu" parent="." instance=ExtResource("4_68aio")]
+visible = false
+layout_mode = 1
+offset_right = 0.0
+
+[connection signal="pressed" from="Menu/PlayButton" to="." method="_on_play_button_pressed"]
+[connection signal="pressed" from="Menu/SettingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="Menu/ExitButton" to="." method="_on_exit_button_pressed"]

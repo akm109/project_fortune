@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://b5lg0foemuvm2"]
+
+[node name="World" type="Node2D"]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="UI" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0

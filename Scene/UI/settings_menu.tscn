@@ -1,0 +1,164 @@
+[gd_scene load_steps=3 format=3 uid="uid://l0t8tssfplmj"]
+
+[ext_resource type="Theme" uid="uid://bd0k88vcwcg37" path="res://Resource/UI/Settings_theme.tres" id="1_v4ayc"]
+[ext_resource type="Script" uid="uid://dsotwyjgjl4ij" path="res://Script/UI/settings_menu.gd" id="2_31dse"]
+
+[node name="SettingsMenu" type="Panel"]
+anchors_preset = -1
+anchor_left = 0.3
+anchor_right = 0.7
+anchor_bottom = 1.0
+offset_right = -0.480103
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("1_v4ayc")
+script = ExtResource("2_31dse")
+
+[node name="TabContainer" type="TabContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+current_tab = 2
+
+[node name="VIDEO" type="Control" parent="TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="GridContainer" type="GridContainer" parent="TabContainer/VIDEO"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.03
+anchor_top = 0.016
+anchor_right = 0.97
+anchor_bottom = 0.85
+grow_horizontal = 2
+grow_vertical = 2
+columns = 2
+
+[node name="WindowModeLabel" type="Label" parent="TabContainer/VIDEO/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "WindowMode"
+
+[node name="WindowModeOptionButton" type="OptionButton" parent="TabContainer/VIDEO/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+item_count = 1
+popup/item_0/text = "Windowed"
+popup/item_0/id = 0
+
+[node name="ResolutionLabel" type="Label" parent="TabContainer/VIDEO/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="ResolutionOptionButton" type="OptionButton" parent="TabContainer/VIDEO/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="BackButton" type="Button" parent="TabContainer/VIDEO"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.4
+anchor_top = 0.887
+anchor_right = 0.6
+anchor_bottom = 0.95
+offset_left = -0.00796509
+offset_top = -0.192017
+offset_right = 0.0230713
+offset_bottom = -0.200012
+grow_horizontal = 2
+grow_vertical = 0
+text = "BACK"
+
+[node name="AUDIO" type="Control" parent="TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="GridContainer" type="GridContainer" parent="TabContainer/AUDIO"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.03
+anchor_top = 0.016
+anchor_right = 0.97
+anchor_bottom = 0.984
+offset_left = -0.0255985
+offset_top = -0.256001
+offset_right = -0.494324
+offset_bottom = 0.255981
+grow_horizontal = 2
+grow_vertical = 2
+columns = 2
+
+[node name="GeneralAudioLabel" type="Label" parent="TabContainer/AUDIO/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+text = "Master Volume"
+
+[node name="HSlider" type="HSlider" parent="TabContainer/AUDIO/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="TabContainer/AUDIO/GridContainer/HSlider"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="TabContainer/AUDIO/GridContainer/HSlider"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -27.9167
+offset_right = 20.0
+offset_bottom = 27.9167
+grow_horizontal = 2
+grow_vertical = 2
+text = "%"
+
+[node name="BackButton" type="Button" parent="TabContainer/AUDIO"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.4
+anchor_top = 0.887
+anchor_right = 0.6
+anchor_bottom = 0.95
+offset_left = -0.00796509
+offset_top = -0.192017
+offset_right = 0.0230713
+offset_bottom = -0.200012
+grow_horizontal = 2
+grow_vertical = 0
+text = "BACK"
+
+[node name="GAMEPLAY" type="Control" parent="TabContainer"]
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="BackButton" type="Button" parent="TabContainer/GAMEPLAY"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.4
+anchor_top = 0.887
+anchor_right = 0.6
+anchor_bottom = 0.95
+offset_left = -0.00796509
+offset_top = -0.192017
+offset_right = 0.0230713
+offset_bottom = -0.200012
+grow_horizontal = 2
+grow_vertical = 0
+text = "BACK"
