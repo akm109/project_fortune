@@ -1,86 +1,263 @@
 extends GridContainer
 
 
-@onready var pattern:= "ordinary"
-@onready var block_path = SLib.globalize_path("res://Scene/World/block.tscn")
+
+@onready var cell_path = SLib.globalize_path("res://Scene/World/cell.tscn")
+
 var solution:= []
+var reduced_solution:= []
+var cells:=[]
+var highlighted_hint: int
+var all_white: bool
 
 
 func _ready()-> void:
-	match pattern:
-		"ordinary":
-			set_columns(9)
-			for i in range(81):
-				var block = load(block_path).instantiate()
-				block.ID = i
-				add_child(block)
-			for i in range(9):
-				for j in range(9):
-					solution.append_array([((i*3 + i/3 + j) % (9) + 1)])
-			solution = randomize_solution(solution)
-			for block in get_children():
-				block.corr_numb = solution[block.ID]
+	cells.resize(81)
+	for i in range(81):
+		var cell = load(cell_path).instantiate()
+		cell.assign_id(i)
+		add_child(cell)
+		cells[i] = cell
+	solution.resize(9)
+	reduced_solution.resize(9)
+	for row in range(9):
+		reduced_solution[row] = []
+		reduced_solution[row].resize(9)
+		solution[row] = []
+		solution[row].resize(9)
+		for col in range(9):
+			solution[row][col] = 0
+	solve()
+	solution = randomize_sol(solution)
+	for row in range(9):
+		for col in range(9):
+			reduced_solution[row][col] = solution[row][col]
+	reduced_solution = solution
+	reduct_numbers(randi_range(50,61))
+	assign_numbers()
+	delete_hints()
 
 
-func randomize_solution(array_solution: Array):
-	var matrix_solution =[]
-	matrix_solution.resize(9)
-	for i in range(9):
-		var intermidiate_array =[]
-		for j in range(9):
-			intermidiate_array.append_array([array_solution[i*9+j]])
-		matrix_solution[i]= intermidiate_array
+func highlight_hints(hint_ID):
+	if  highlighted_hint == hint_ID and (not all_white):
+		for cell in cells:
+			cell.back.set_color(Color.WHITE)
+			for hint in cell.hints:
+				hint.label_settings.set_font_color(Color.BLACK)
+				hint.label_settings.set_font_size(16)
+		all_white = true
+		return
+	for cell in cells:
+		cell.back.set_color(Color.WHITE)
+		for hint in cell.hints:
+			if hint.is_visible():
+				hint.label_settings.set_font_color(Color.BLACK)
+				hint.label_settings.set_font_size(16)
+				if (hint.text == str(hint_ID)):
+					hint.label_settings.set_font_color(Color.RED)
+					hint.label_settings.set_font_size(24)
+					cell.back.set_color(Color(0.7, 0.95, 1.0))
+	all_white = false
+	highlighted_hint = hint_ID
+
+
+func print_matrix(matrix:Array):
+	print("\n")
+	for row in matrix:
+		print(row)
+	print("\n")
+
+
+func reduct_numbers(count):
+	for i in range(count):
+		var row = randi()%9
+		var col = randi()%9
+		while reduced_solution[row][col] == 0:
+			row = randi()%9
+			col = randi()%9
+		reduced_solution[row][col] = 0
+
+
+func assign_numbers():
+	for row in range(9):
+		for col in range(9):
+			var cell = cells[row*9+col]
+			if reduced_solution[row][col] != 0:
+				cell.assign_number(reduced_solution[row][col])
+
+
+func delete_hints():
+	for cell in cells:
+		var row = int(cell.ID/9)
+		var col = cell.ID % 9
+		if cell.show_numb == 0:
+			for possible_values in range(1,10):
+				if !check_loyalty(possible_values,[row,col], reduced_solution):
+					cell.hints[possible_values-1].hide()
+		else:
+			for hint in cell.hints:
+				hint.hide()
+
+
+func solve() -> bool:
+	var row
+	var col
+	var find = self.find_empty(solution)
+	if not find:
+		return true
+	else:
+		row = find[0]
+		col = find[1]
+	for possible_values in range(1,10):
+		if check_loyalty(possible_values, [row, col], solution):
+			solution[row][col] = possible_values
+			if solve():
+				return true
+			solution[row][col] = 0
+	return false
+
+
+func check_loyalty(attempted_number, index, matrix)-> bool:
+	if not check_repeating_number_row(attempted_number, index, matrix):
+		if not check_repeating_number_col(attempted_number, index, matrix):
+			if not check_repeating_number_in_box(attempted_number, index, matrix):
+				return true
+	return false
+
+func find_empty(matrix):
+	for row in range(matrix.size()):
+		for col in range(matrix.size()):
+			if matrix[row][col] == 0:
+				return [row, col]
+
+
+func check_repeating_number_row(attempted_number, index, matrix)-> bool:
+	# Will check for any of the same number in a column
+	for col in range(solution.size()):
+		if matrix[index[0]][col] == attempted_number and col != index[1]:
+			return true
+	return false
+
+
+func check_repeating_number_col(attempted_number, index, matrix)-> bool:
+	# Will check for any repeating number in a row
+	for row in range(solution.size()):
+		if matrix[row][index[1]] == attempted_number and row != index[0]:
+			return true
+	return false
+
+
+func check_repeating_number_in_box(attempted_number, index, matrix)-> bool:
+	# Will check for any repeating number in a box
+	var box_row = int(index[0] / 3)
+	var box_col = int(index[1] / 3)
+	for row in range(box_row * 3, box_row * 3 + 3):
+		for col in range(box_col * 3, box_col * 3 + 3):
+			if ([row, col]) != (index) and matrix[row][col] == attempted_number:
+				return true
+	return false
+
+
+func validation_check()-> bool:
+	# If it detects any tiles that aren't valid in the sudoku then it will return false
+	# no point in searching the rest of the array as once one position is invalid
+	# the whole sudoku will be invalid
+	for row in range(solution.size()):
+		for col in range(solution.size()):
+			if solution[row][col] != 0:
+				if not check_loyalty(solution[row][col], [row, col], solution):
+					return false
+	return true
+
+
+func randomize_sol(matrix):
+	var answer = matrix.duplicate(true)
 	for i in range(100):
-		var k = randi() % 3
+		var k: int
+		k = randi()%5
 		match k:
 			0:
-				matrix_solution = change_cols(matrix_solution)
+				answer = change_big_cols(answer)
 			1:
-				matrix_solution = change_rows(matrix_solution)
+				answer = change_big_rows(answer)
 			2:
-				matrix_solution = transponse(matrix_solution)
-	array_solution.resize(0)
-	for i in matrix_solution.size():
-		array_solution.append_array(matrix_solution[i])
-	return array_solution
+				answer = transpose(answer)
+			3:
+				answer = change_cols(answer)
+			4:
+				answer =  change_rows(answer)
+	return answer
 
 
-func print_matrix_pretty(matrix:Array)-> void:
-	for i in range(matrix.size()):
-		print(matrix[i])
-	print("")
-
-
-func transponse(matrix: Array)->Array:
-	var rows = matrix.size()
-	var cols = matrix[0].size()
-	var new_matrix:= []
-	new_matrix.resize(cols)
-	for i in range(cols):
-		new_matrix[i] = []
-	for i in range(rows):
-		for j in range(cols):
-			new_matrix[j].append(matrix[i][j])
-	return new_matrix
-
-
-func change_rows(matrix:Array)->Array:
-	var new_matrix: Array
-	var row_1 = randi() % matrix.size()
-	var row_2 = randi() % matrix.size()
+func change_rows(matrix):
+	var buf1:=[]
+	var buf2:=[]
+	var answer = matrix.duplicate(true)
+	var row_1: int
+	var row_2: int
+	var row_area:= randi()%3
+	row_1 = randi()%3
+	row_2 = randi()%3
 	while row_1 == row_2:
-		row_2 = randi() % matrix.size()
-	new_matrix.resize(matrix.size())
-	new_matrix[row_1] = matrix[row_2]
-	new_matrix[row_2] = matrix[row_1]
-	for i in range(matrix.size()):
-		if (i != row_1) and (i != row_2):
-			new_matrix[i] = matrix[i]
-	return new_matrix
+		row_1 = randi()%3
+		row_2 = randi()%3
+	buf1 = matrix[row_1+row_area*3]
+	buf2 = matrix[row_2+row_area*3]
+	answer[row_1+row_area*3] = buf2
+	answer[row_2+row_area*3] = buf1
+	return answer
 
 
-func change_cols(matrix:Array)->Array:
-	matrix = transponse(matrix)
-	matrix = change_rows(matrix)
-	matrix =  transponse(matrix)
-	return matrix
+func change_big_rows(matrix):
+	var buf1:=[]
+	var buf2:=[]
+	var answer = matrix.duplicate(true)
+	buf1.resize(3)
+	buf2.resize(3)
+	var big_row_1: int
+	var big_row_2: int
+	big_row_1 = randi()%3
+	big_row_2 = randi()%3
+	while big_row_1 == big_row_2:
+		big_row_1 = randi()%3
+		big_row_2 = randi()%3
+	for i in range(3):
+		buf1[i] = []
+		buf2[i] = []
+	for i in range(3):
+		buf1[i].append_array(matrix[i+big_row_1*3])
+		buf2[i].append_array(matrix[i+big_row_2*3])
+	for i in range(3):
+		answer[i+big_row_1*3] = buf2[i]
+		answer[i+big_row_2*3] = buf1[i]
+	return answer
+
+
+func change_cols(matrix):
+	var answer = matrix.duplicate(true)
+	answer = transpose(answer)
+	answer = change_rows(answer)
+	answer = transpose(answer)
+	return answer
+
+
+func change_big_cols(matrix):
+	var answer = matrix.duplicate(true)
+	answer = transpose(answer)
+	answer = change_big_rows(answer)
+	answer = transpose(answer)
+	return answer
+
+
+
+func transpose(matrix):
+	var buff:=[]
+	var answer:=[]
+	answer.resize(9)
+	buff= matrix.duplicate(true)
+	for row in range(matrix.size()):
+		answer[row]=[]
+		answer[row].resize(9)
+		for col in range(matrix.size()):
+			answer[row][col]=buff[col][row]
+	return answer

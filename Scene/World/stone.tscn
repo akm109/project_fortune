@@ -1,0 +1,53 @@
+[gd_scene load_steps=5 format=3 uid="uid://bfhmjgj0ipngk"]
+
+[ext_resource type="Script" uid="uid://cplhgrs61qhqh" path="res://Script/World/stone.gd" id="1_1b3e5"]
+[ext_resource type="FontFile" uid="uid://bh426cyhkero8" path="res://Fonts/Comic Sans MS.ttf" id="2_ivr31"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_rdqgh"]
+size = Vector2(81, 81)
+
+[sub_resource type="LabelSettings" id="LabelSettings_ps48k"]
+resource_local_to_scene = true
+font = ExtResource("2_ivr31")
+font_size = 58
+
+[node name="Stone" type="Node2D"]
+z_index = 110
+position = Vector2(900, 450)
+script = ExtResource("1_1b3e5")
+
+[node name="StoneSprite" type="Sprite2D" parent="."]
+texture = SubResource("PlaceholderTexture2D_rdqgh")
+
+[node name="Label" type="Label" parent="StoneSprite"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.5
+offset_top = -40.5
+offset_right = -40.5
+offset_bottom = -40.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "1"
+label_settings = SubResource("LabelSettings_ps48k")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="PanelContainer" type="PanelContainer" parent="StoneSprite"]
+show_behind_parent = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.5
+offset_top = -40.5
+offset_right = -40.5
+offset_bottom = -40.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_default_cursor_shape = 2
+
+[node name="AnimationTimer" type="Timer" parent="StoneSprite"]
+wait_time = 1.5
+one_shot = true

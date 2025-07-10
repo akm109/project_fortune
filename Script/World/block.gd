@@ -1,22 +1,98 @@
 extends Control
 
 
-@onready var label: Label = $Label
+@onready var number: Label = $Number
+@onready var top_color_rect: ColorRect = $TopColorRect
+@onready var right_color_rect: ColorRect = $RightColorRect
+@onready var bottom_color_rect: ColorRect = $BottomColorRect
+@onready var left_color_rect: ColorRect = $LeftColorRect
+@onready var back: ColorRect = $Back
 
 
 var ID: int
-var corr_numb: int
-var previous_corr_numb: int
+var show_numb:= 0
+var hints:=[]
+
+
 func _ready() -> void:
 	for child in get_children():
-		if child is Label:
+		if (child is Label) and (child.get_name() !="Number"):
 			child.set_text(child.get_name())
 			child.set_horizontal_alignment(1)
-			#child.hide()
+			hints.append(child)
+	for hint in hints:
+		hint.label_settings.set_font_color(Color.BLACK)
 
 
-func _process(_delta:float)->void:
-	if corr_numb!= previous_corr_numb:
-		label.set_text(str(corr_numb))
-		label.set_visible(true)
-		previous_corr_numb = corr_numb
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion:
+		if get_rect().abs().has_point(get_local_mouse_position()):
+			Global.hovered_cell = self
+			print(get_local_mouse_position(),'asdasda    ', self)
+		#elif Global.hovered_cell == self:
+		#	Global.hovered_cell = null
+
+
+func assign_id(pop:int)->void:
+	ID = pop
+	await ready
+	var bottom_list:= []
+	for i in range(9):
+		bottom_list.append(18+i)
+		bottom_list.append(45+i)
+		bottom_list.append(72+i)
+	var top_list:=[]
+	for i in range(9):
+		top_list.append(i)
+		top_list.append(27+i)
+		top_list.append(54+i)
+	if ID % 3 == 0:
+		blacken(left_color_rect)
+		if ID % 9 == 0:
+			left_color_rect.custom_minimum_size.x = 10
+	if ID % 3 == 2:
+		blacken(right_color_rect)
+		if ID % 9 == 8:
+			right_color_rect.custom_minimum_size.x = 10
+	if bottom_list.has(ID):
+		blacken(bottom_color_rect)
+		if ID in range(72,81):
+			bottom_color_rect.custom_minimum_size.y = 10
+	if top_list.has(ID):
+		blacken(top_color_rect)
+		if ID in range(9):
+			top_color_rect.custom_minimum_size.y = 10
+
+
+func assign_number(dop):
+	number.set_text(str(dop))
+	show_numb = dop
+
+
+
+func delete_number():
+	show_numb = 0
+	number.set_text("")
+
+
+func blacken(border: ColorRect):
+	border.set_color(Color.BLACK)
+	border.set_z_index(1)
+
+
+
+func show_number():
+	number.set_text(str(show_numb))
+	number.set_visible(true)
+
+
+func _on_number_placed(cell_id:int ):
+	pass
+
+
+func _on_mouse_entered() -> void:
+	print(get_global_mouse_position())
+
+
+func _on_mouse_exited() -> void:
+	pass

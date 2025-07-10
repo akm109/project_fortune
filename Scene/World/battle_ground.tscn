@@ -1,0 +1,162 @@
+[gd_scene load_steps=4 format=3 uid="uid://necinktroavg"]
+
+[ext_resource type="PackedScene" uid="uid://cc8tw7s2nevni" path="res://Scene/World/ordinary_sudoku.tscn" id="1_km1vx"]
+[ext_resource type="Script" uid="uid://xp6fb0u7060e" path="res://Script/World/battle_ground.gd" id="1_ktiin"]
+[ext_resource type="Texture2D" uid="uid://wnstcvivlewf" path="res://icon.svg" id="2_xcvva"]
+
+[node name="BattleGround" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ktiin")
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.75
+anchor_right = 1.00004
+anchor_bottom = 1.00044
+offset_right = -0.0800781
+offset_bottom = -0.480103
+alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="CenterContainer2" type="CenterContainer" parent="VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3
+metadata/_edit_use_anchors_ = true
+
+[node name="Control" type="Control" parent="VBoxContainer2/CenterContainer2"]
+layout_mode = 2
+
+[node name="Enemy" type="Sprite2D" parent="VBoxContainer2/CenterContainer2/Control"]
+texture = ExtResource("2_xcvva")
+
+[node name="Button" type="Button" parent="VBoxContainer2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 76
+text = "END TURN"
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.25
+anchor_top = 0.0111111
+anchor_right = 0.75
+anchor_bottom = 0.889
+offset_bottom = -0.120056
+grow_horizontal = 2
+grow_vertical = 2
+alignment_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="Panel" type="ColorRect" parent="AspectRatioContainer"]
+visible = false
+z_index = -4
+layout_mode = 2
+color = Color(0.08, 0.08, 0.08, 0.364706)
+
+[node name="OrdinarySudoku" parent="AspectRatioContainer" instance=ExtResource("1_km1vx")]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.25
+anchor_bottom = 1.0
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.35
+columns = 2
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+nine_patch_stretch = true
+texture_under = ExtResource("2_xcvva")
+tint_under = Color(1, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "100"
+
+[node name="TextureProgressBar2" type="TextureProgressBar" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+nine_patch_stretch = true
+texture_under = ExtResource("2_xcvva")
+tint_under = Color(0, 0, 1, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="Label2" type="Label" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "100"
+
+[node name="TextureProgressBar3" type="TextureProgressBar" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+nine_patch_stretch = true
+texture_under = ExtResource("2_xcvva")
+tint_under = Color(0, 1, 0, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="Label3" type="Label" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "100"
+
+[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+metadata/_edit_use_anchors_ = true
+
+[node name="Control" type="Control" parent="VBoxContainer/CenterContainer"]
+layout_mode = 2
+
+[node name="Player" type="Sprite2D" parent="VBoxContainer/CenterContainer/Control"]
+texture = ExtResource("2_xcvva")
+
+[node name="CenterContainer2" type="CenterContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+metadata/_edit_use_anchors_ = true
+
+[node name="Control" type="Control" parent="VBoxContainer/CenterContainer2"]
+layout_mode = 2
+
+[node name="Bag" type="Sprite2D" parent="VBoxContainer/CenterContainer2/Control"]
+self_modulate = Color(0.41, 0.24395, 0.041, 1)
+z_index = 2
+scale = Vector2(3.665, 3.665)
+texture = ExtResource("2_xcvva")
+
+[node name="Panel" type="ColorRect" parent="."]
+z_index = -4
+layout_mode = 2
+anchor_left = 0.253
+anchor_top = 0.893
+anchor_right = 0.747
+anchor_bottom = 1.0
+offset_left = 0.23996
+offset_top = -0.440063
+offset_right = -0.240112
+color = Color(0.08, 0.08, 0.08, 0.364706)
+
+[node name="StoneContainer" type="HBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[connection signal="pressed" from="VBoxContainer2/Button" to="." method="_on_button_pressed"]
