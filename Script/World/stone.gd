@@ -7,10 +7,10 @@ const FOLLOW_SPEED = 10.0
 @onready var stone_sprite: Sprite2D = $StoneSprite
 @onready var label: Label = $StoneSprite/Label
 @onready var animation_timer: Timer = $StoneSprite/AnimationTimer
+@onready var panel_container: PanelContainer = $StoneSprite/PanelContainer
 
 
 var focused:= false
-var dragable:= false
 var gota_go := false
 var in_bag:= false
 var pos_to_go: Vector2
@@ -25,63 +25,53 @@ var heritage: Dictionary ={
 
 signal dropped(stone)
 signal stone_stopped(stone)
-signal took_stone(stone)
+signal taken(stone)
 
 func _ready() -> void:
 	pass
 
 
 func _input(event: InputEvent) -> void:
+#Handle taking stone
 	if event is InputEventMouseButton and event.is_action_pressed("LMB"):
 		if stone_sprite.get_rect().has_point(to_local(event.position)):
-			dragable = true
-			ID = -1
-			took_stone.emit(self)
-	if event is InputEventMouseButton and event.is_action_released("LMB"):
-		if dragable:
-			dragable = false
-			dropped.emit(self)
+			if not focused:                        #if we clicked on stone that wasnt taken already we take it
+				focuse(true)
+			else:
+				focuse(false)                      #if it was already taken we drop it
+		elif focused:
+			focuse(false)                          # if we had stone in hands and clicked somewhere else we drop it
 
 
-func _process(delta: float) -> void:
-	t = 1 -exp(- delta*FOLLOW_SPEED)
-	if dragable:
-		velocity = global_position.lerp(get_global_mouse_position(), t) - global_position
-		global_position += velocity
-	elif not velocity.is_zero_approx():
-		global_position += velocity
-		velocity = velocity*0.85
+
+func focuse(foc: bool) -> void:
+	if foc:
+		panel_container.set_modulate(Color.RED)   #if focused highlight it!! and tell everbody around about it
+		focused = true
+		taken.emit(self)
 	else:
-		stone_stopped.emit(self)
-	if gota_go:
-		global_position = global_position.lerp(pos_to_go, t)
-		if( global_position - pos_to_go).is_zero_approx():
-			gota_go = false
+		panel_container.set_modulate(Color.WHITE) # if you dropped it strip off it's regalia and tell everyone about it
+		focused = false
+		dropped.emit(self)
 
 
-func focuse():
-	stone_sprite.set_scale(Vector2(1.5,1.5))
-	emit_signal("pocus")
-	animation_timer.start()
-
-
-func assign_heritage():
-	heritage.type = Global.types.pick_random()
-	print(heritage.type)
-	heritage.number = randi() % 9 + 1
-	await ready
+func assign_heritage() -> void:
+	await ready                                                    # wait a little so nothing brokes when we trie to do smth 
+	var choosen_rock = Global.bag_rocks.pick_random().duplicate()  # I want marble just like yours but mine
+	Global.bag_rocks.erase(choosen_rock)                           # Throw away your marble
+	heritage.type = choosen_rock[1]
+	heritage.number = choosen_rock[0]
 	label.text = str(heritage.number)
-	match_color(heritage.type)
-	print(label.label_settings.font_color)
+	match_color(heritage.type)                                     # Now stone looks just like that marble
 
 
 func match_color(type:String):
 	match type:
 		"attack":
-			label.label_settings.font_color = Color.RED
+			label.label_settings.font_color = Color.RED             # Red stands for BLOOD of our Enemies
 		"deffend":
-			label.label_settings.font_color = Color.SILVER
+			label.label_settings.font_color = Color.LIGHT_BLUE      #  Light blue seems just like tint of steel shield
 		"magick":
-			label.label_settings.font_color = Color.BLUE_VIOLET
+			label.label_settings.font_color = Color.BLUE_VIOLET     # Violet Magic?
 		"special":
-			label.label_settings.font_color = Color.ORANGE
+			label.label_settings.font_color = Color.ORANGE          # Orange....

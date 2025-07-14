@@ -1,15 +1,15 @@
 extends GridContainer
 
-
+class_name Sudoku
 
 @onready var cell_path = SLib.globalize_path("res://Scene/World/cell.tscn")
 
-var solution:= []
-var reduced_solution:= []
-var cells:=[]
+var solution:Array[Array]
+var reduced_solution:Array[Array]
+var cells:Array[Control]
 var highlighted_hint: int
 var all_white: bool
-
+var shown_numbers: Array[Array]
 
 func _ready()-> void:
 	cells.resize(81)
@@ -35,11 +35,12 @@ func _ready()-> void:
 	reduced_solution = solution
 	reduct_numbers(randi_range(50,61))
 	assign_numbers()
-	delete_hints()
+	delete_init_hints()
+	shown_numbers = reduced_solution.duplicate()
 
 
-func highlight_hints(hint_ID):
-	if  highlighted_hint == hint_ID and (not all_white):
+func highlight_hints(hint_ID:int):
+	if  highlighted_hint == hint_ID and (not all_white):              #if we already highlited this number we should unhighlight it!!!
 		for cell in cells:
 			cell.back.set_color(Color.WHITE)
 			for hint in cell.hints:
@@ -48,37 +49,47 @@ func highlight_hints(hint_ID):
 		all_white = true
 		return
 	for cell in cells:
-		cell.back.set_color(Color.WHITE)
+		cell.back.set_color(Color.WHITE)                              # set everything default
 		for hint in cell.hints:
 			if hint.is_visible():
 				hint.label_settings.set_font_color(Color.BLACK)
 				hint.label_settings.set_font_size(16)
-				if (hint.text == str(hint_ID)):
+				if (hint.text == str(hint_ID)):                       #if it is possible to place here given number => highlight possibility!!
 					hint.label_settings.set_font_color(Color.RED)
 					hint.label_settings.set_font_size(24)
 					cell.back.set_color(Color(0.7, 0.95, 1.0))
-	all_white = false
-	highlighted_hint = hint_ID
+	all_white = false                                                 # not all squares white
+	highlighted_hint = hint_ID                                        #remember what we highlighted later to unhighlight later if needed
 
 
-func print_matrix(matrix:Array):
+func unhighlight_hints()-> void:
+	for cell in cells:
+		cell.back.set_color(Color.WHITE)
+		for hint in cell.hints:
+			hint.label_settings.set_font_color(Color.BLACK)
+			hint.label_settings.set_font_size(16)
+	all_white = true
+	highlighted_hint = 0
+
+
+func print_matrix(matrix:Array[Array])-> void:                        # pretty matrix  print
 	print("\n")
 	for row in matrix:
 		print(row)
 	print("\n")
 
 
-func reduct_numbers(count):
-	for i in range(count):
+func reduct_numbers(count)-> void:
+	for i in range(count):                                              # delete count times numbers
 		var row = randi()%9
 		var col = randi()%9
-		while reduced_solution[row][col] == 0:
+		while reduced_solution[row][col] == 0:                          # you cant delete nothingess
 			row = randi()%9
 			col = randi()%9
-		reduced_solution[row][col] = 0
+		reduced_solution[row][col] = 0                                  # Finish him
 
 
-func assign_numbers():
+func assign_numbers()-> void:                                            # Show them what you got!
 	for row in range(9):
 		for col in range(9):
 			var cell = cells[row*9+col]
@@ -86,7 +97,21 @@ func assign_numbers():
 				cell.assign_number(reduced_solution[row][col])
 
 
-func delete_hints():
+func delete_hints()-> void:
+	
+	for cell in cells:
+		var row = int(cell.ID/9)
+		var col = cell.ID % 9
+		if cell.show_numb == 0:
+			for possible_values in range(1,10):
+				if !check_loyalty(possible_values,[row,col], shown_numbers):
+					cell.hints[possible_values-1].hide()
+		else:
+			for hint in cell.hints:
+				hint.hide()
+
+
+func delete_init_hints()-> void:
 	for cell in cells:
 		var row = int(cell.ID/9)
 		var col = cell.ID % 9
@@ -102,8 +127,8 @@ func delete_hints():
 func solve() -> bool:
 	var row
 	var col
-	var find = self.find_empty(solution)
-	if not find:
+	var find = find_empty(solution)
+	if find == [null]:
 		return true
 	else:
 		row = find[0]
@@ -117,21 +142,23 @@ func solve() -> bool:
 	return false
 
 
-func check_loyalty(attempted_number, index, matrix)-> bool:
+func check_loyalty(attempted_number:int, index:Array[int], matrix: Array[Array])-> bool:
 	if not check_repeating_number_row(attempted_number, index, matrix):
 		if not check_repeating_number_col(attempted_number, index, matrix):
 			if not check_repeating_number_in_box(attempted_number, index, matrix):
 				return true
 	return false
 
-func find_empty(matrix):
+
+func find_empty(matrix)->Array:
 	for row in range(matrix.size()):
 		for col in range(matrix.size()):
 			if matrix[row][col] == 0:
 				return [row, col]
+	return [null]
 
 
-func check_repeating_number_row(attempted_number, index, matrix)-> bool:
+func check_repeating_number_row(attempted_number:int, index:Array[int], matrix: Array[Array])-> bool:
 	# Will check for any of the same number in a column
 	for col in range(solution.size()):
 		if matrix[index[0]][col] == attempted_number and col != index[1]:
@@ -139,7 +166,7 @@ func check_repeating_number_row(attempted_number, index, matrix)-> bool:
 	return false
 
 
-func check_repeating_number_col(attempted_number, index, matrix)-> bool:
+func check_repeating_number_col(attempted_number:int, index:Array[int], matrix: Array[Array])-> bool:
 	# Will check for any repeating number in a row
 	for row in range(solution.size()):
 		if matrix[row][index[1]] == attempted_number and row != index[0]:
@@ -147,7 +174,7 @@ func check_repeating_number_col(attempted_number, index, matrix)-> bool:
 	return false
 
 
-func check_repeating_number_in_box(attempted_number, index, matrix)-> bool:
+func check_repeating_number_in_box(attempted_number:int, index:Array[int], matrix: Array[Array])-> bool:
 	# Will check for any repeating number in a box
 	var box_row = int(index[0] / 3)
 	var box_col = int(index[1] / 3)
@@ -170,8 +197,8 @@ func validation_check()-> bool:
 	return true
 
 
-func randomize_sol(matrix):
-	var answer = matrix.duplicate(true)
+func randomize_sol(matrix: Array[Array])-> Array[Array]:
+	var answer: Array[Array] = matrix.duplicate(true)
 	for i in range(100):
 		var k: int
 		k = randi()%5
@@ -189,10 +216,10 @@ func randomize_sol(matrix):
 	return answer
 
 
-func change_rows(matrix):
+func change_rows(matrix:Array[Array])-> Array[Array]:
 	var buf1:=[]
 	var buf2:=[]
-	var answer = matrix.duplicate(true)
+	var answer: Array[Array]= matrix.duplicate(true)
 	var row_1: int
 	var row_2: int
 	var row_area:= randi()%3
@@ -208,10 +235,10 @@ func change_rows(matrix):
 	return answer
 
 
-func change_big_rows(matrix):
+func change_big_rows(matrix:Array[Array])-> Array[Array]:
 	var buf1:=[]
 	var buf2:=[]
-	var answer = matrix.duplicate(true)
+	var answer: Array[Array] = matrix.duplicate(true)
 	buf1.resize(3)
 	buf2.resize(3)
 	var big_row_1: int
@@ -233,16 +260,16 @@ func change_big_rows(matrix):
 	return answer
 
 
-func change_cols(matrix):
-	var answer = matrix.duplicate(true)
+func change_cols(matrix:Array[Array])-> Array[Array]:
+	var answer: Array[Array]  = matrix.duplicate(true)
 	answer = transpose(answer)
 	answer = change_rows(answer)
 	answer = transpose(answer)
 	return answer
 
 
-func change_big_cols(matrix):
-	var answer = matrix.duplicate(true)
+func change_big_cols(matrix:Array[Array])-> Array[Array]:
+	var answer: Array[Array] = matrix.duplicate(true)
 	answer = transpose(answer)
 	answer = change_big_rows(answer)
 	answer = transpose(answer)
@@ -250,9 +277,9 @@ func change_big_cols(matrix):
 
 
 
-func transpose(matrix):
-	var buff:=[]
-	var answer:=[]
+func transpose(matrix:Array[Array])-> Array[Array]:
+	var buff: Array[Array]
+	var answer: Array[Array]
 	answer.resize(9)
 	buff= matrix.duplicate(true)
 	for row in range(matrix.size()):

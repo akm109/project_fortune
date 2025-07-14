@@ -26,11 +26,10 @@ func _ready() -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
-		if get_rect().abs().has_point(get_local_mouse_position()):
+		if is_mouse_in():
 			Global.hovered_cell = self
-			print(get_local_mouse_position(),'asdasda    ', self)
-		#elif Global.hovered_cell == self:
-		#	Global.hovered_cell = null
+		elif Global.hovered_cell == self:
+			Global.hovered_cell = null
 
 
 func assign_id(pop:int)->void:
@@ -90,9 +89,19 @@ func _on_number_placed(cell_id:int ):
 	pass
 
 
+func is_mouse_in() -> bool:
+	var pos: Vector2 = get_global_position()
+	var mouse_pos: Vector2 = get_global_mouse_position()
+	if (mouse_pos.y > pos.y) and (mouse_pos.y < (pos.y + size.y)):
+		if (mouse_pos.x > pos.x) and (mouse_pos.x < (pos.x + size.x)):
+			return true
+	return false
+
 func _on_mouse_entered() -> void:
-	print(get_global_mouse_position())
+	if Global.hovered_cell != self:
+		Global.hovered_cell = self
 
 
 func _on_mouse_exited() -> void:
-	pass
+	if Global.hovered_cell == self:
+		Global.hovered_cell = null

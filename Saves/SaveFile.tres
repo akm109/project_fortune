@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://qadabyvwt4c0"]
+
+[sub_resource type="GDScript" id="GDScript_kqteq"]
+script/source = "extends Resource
+
+class_name Save
+
+
+@export var base_rocks: Array[Array]
+"
+
+[resource]
+script = SubResource("GDScript_kqteq")
+base_rocks = Array[Array]([])

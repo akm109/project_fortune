@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://bfhmjgj0ipngk"]
+[gd_scene load_steps=6 format=3 uid="uid://bfhmjgj0ipngk"]
 
 [ext_resource type="Script" uid="uid://cplhgrs61qhqh" path="res://Script/World/stone.gd" id="1_1b3e5"]
 [ext_resource type="FontFile" uid="uid://bh426cyhkero8" path="res://Fonts/Comic Sans MS.ttf" id="2_ivr31"]
@@ -10,6 +10,13 @@ size = Vector2(81, 81)
 resource_local_to_scene = true
 font = ExtResource("2_ivr31")
 font_size = 58
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1b3e5"]
+draw_center = false
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
 
 [node name="Stone" type="Node2D"]
 z_index = 110
@@ -37,6 +44,7 @@ metadata/_edit_use_anchors_ = true
 
 [node name="PanelContainer" type="PanelContainer" parent="StoneSprite"]
 show_behind_parent = true
+z_index = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -46,7 +54,9 @@ offset_right = -40.5
 offset_bottom = -40.5
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 mouse_default_cursor_shape = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1b3e5")
 
 [node name="AnimationTimer" type="Timer" parent="StoneSprite"]
 wait_time = 1.5
