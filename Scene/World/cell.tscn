@@ -23,7 +23,7 @@ gradient = SubResource("Gradient_1noqf")
 
 [sub_resource type="Gradient" id="Gradient_ltuy3"]
 offsets = PackedFloat32Array(0)
-colors = PackedColorArray(0.4823, 0.61061, 0.91, 0.552941)
+colors = PackedColorArray(0.517942, 0.91, 0.4823, 0.552941)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_ltuy3"]
 gradient = SubResource("Gradient_ltuy3")
@@ -37,7 +37,7 @@ gradient = SubResource("Gradient_nouug")
 
 [sub_resource type="Gradient" id="Gradient_y38l7"]
 offsets = PackedFloat32Array(0)
-colors = PackedColorArray(0.482353, 0.611765, 0.909804, 0.552941)
+colors = PackedColorArray(0.517647, 0.909804, 0.482353, 0.552941)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_nouug"]
 gradient = SubResource("Gradient_y38l7")

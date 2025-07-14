@@ -3,9 +3,9 @@ extends Node
 
 var const_rocks: Array[Array]
 var bag_rocks: Array[Array]
-var types:= ["attack","deffend","magic","special"]
-var hovered_cell
-var perv_cell
+var types:Array[String]= ["attack","deffend","magic","special"]
+var hovered_cell: Cell
+var choosen_hint: int = -1
 
 
 func _ready() -> void:

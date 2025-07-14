@@ -47,6 +47,7 @@ func highlight_hints(hint_ID:int):
 				hint.label_settings.set_font_color(Color.BLACK)
 				hint.label_settings.set_font_size(16)
 		all_white = true
+		Global.choosen_hint = -1
 		return
 	for cell in cells:
 		cell.back.set_color(Color.WHITE)                              # set everything default
@@ -58,6 +59,7 @@ func highlight_hints(hint_ID:int):
 					hint.label_settings.set_font_color(Color.RED)
 					hint.label_settings.set_font_size(24)
 					cell.back.set_color(Color(0.7, 0.95, 1.0))
+	Global.choosen_hint = hint_ID
 	all_white = false                                                 # not all squares white
 	highlighted_hint = hint_ID                                        #remember what we highlighted later to unhighlight later if needed
 
@@ -70,6 +72,7 @@ func unhighlight_hints()-> void:
 			hint.label_settings.set_font_size(16)
 	all_white = true
 	highlighted_hint = 0
+	Global.choosen_hint = -1
 
 
 func print_matrix(matrix:Array[Array])-> void:                        # pretty matrix  print
@@ -94,11 +97,10 @@ func assign_numbers()-> void:                                            # Show 
 		for col in range(9):
 			var cell = cells[row*9+col]
 			if reduced_solution[row][col] != 0:
-				cell.assign_number(reduced_solution[row][col])
+				cell.assign_number(reduced_solution[row][col],"none")
 
 
 func delete_hints()-> void:
-	
 	for cell in cells:
 		var row = int(cell.ID/9)
 		var col = cell.ID % 9

@@ -1,6 +1,9 @@
 extends Node2D
 
 
+class_name Stone
+
+
 const FOLLOW_SPEED = 10.0
 
 
@@ -55,7 +58,8 @@ func focuse(foc: bool) -> void:
 
 
 func assign_heritage() -> void:
-	await ready                                                    # wait a little so nothing brokes when we trie to do smth 
+	if not is_node_ready():
+		await ready                                                    # wait a little so nothing brokes when we trie to do smth 
 	var choosen_rock = Global.bag_rocks.pick_random().duplicate()  # I want marble just like yours but mine
 	Global.bag_rocks.erase(choosen_rock)                           # Throw away your marble
 	heritage.type = choosen_rock[1]
@@ -69,7 +73,7 @@ func match_color(type:String):
 		"attack":
 			label.label_settings.font_color = Color.RED             # Red stands for BLOOD of our Enemies
 		"deffend":
-			label.label_settings.font_color = Color.LIGHT_BLUE      #  Light blue seems just like tint of steel shield
+			label.label_settings.font_color = Color.DODGER_BLUE    #  Light blue seems just like tint of steel shield
 		"magick":
 			label.label_settings.font_color = Color.BLUE_VIOLET     # Violet Magic?
 		"special":

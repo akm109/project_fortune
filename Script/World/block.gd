@@ -1,5 +1,7 @@
 extends Control
 
+class_name Cell
+
 
 @onready var number: Label = $Number
 @onready var top_color_rect: ColorRect = $TopColorRect
@@ -11,7 +13,11 @@ extends Control
 
 var ID: int
 var show_numb:= 0
-var hints:=[]
+var hints:Array[Label]
+var type: String
+
+
+signal here(cell: Cell)
 
 
 func _ready() -> void:
@@ -30,17 +36,20 @@ func _input(event: InputEvent) -> void:
 			Global.hovered_cell = self
 		elif Global.hovered_cell == self:
 			Global.hovered_cell = null
+	if event.is_action_pressed("RMB"):
+		if is_mouse_in():
+			here.emit(self)
 
 
 func assign_id(pop:int)->void:
 	ID = pop
 	await ready
-	var bottom_list:= []
+	var bottom_list:Array= []
 	for i in range(9):
 		bottom_list.append(18+i)
 		bottom_list.append(45+i)
 		bottom_list.append(72+i)
-	var top_list:=[]
+	var top_list:Array=[]
 	for i in range(9):
 		top_list.append(i)
 		top_list.append(27+i)
@@ -63,23 +72,34 @@ func assign_id(pop:int)->void:
 			top_color_rect.custom_minimum_size.y = 10
 
 
-func assign_number(dop):
+func assign_number(dop:int, cop:String)-> void:
 	number.set_text(str(dop))
 	show_numb = dop
+	type = cop
+	match type:
+		"attack":
+			number.label_settings.font_color = Color.RED
+		"deffend":
+			number.label_settings.font_color = Color.DODGER_BLUE 
+		"magick":
+			number.label_settings.font_color = Color.BLUE_VIOLET
+		"special":
+			number.label_settings.font_color = Color.ORANGE
+		"none":
+			return
 
 
-
-func delete_number():
+func delete_number()-> void:
 	show_numb = 0
 	number.set_text("")
 
 
-func blacken(border: ColorRect):
+func blacken(border: ColorRect)-> void:
 	border.set_color(Color.BLACK)
 	border.set_z_index(1)
 
 
-func show_number():
+func show_number()-> void:
 	number.set_text(str(show_numb))
 	number.set_visible(true)
 
@@ -91,12 +111,3 @@ func is_mouse_in() -> bool:
 		if (mouse_pos.x > pos.x) and (mouse_pos.x < (pos.x + size.x)):
 			return true
 	return false
-
-func _on_mouse_entered() -> void:
-	if Global.hovered_cell != self:
-		Global.hovered_cell = self
-
-
-func _on_mouse_exited() -> void:
-	if Global.hovered_cell == self:
-		Global.hovered_cell = null
