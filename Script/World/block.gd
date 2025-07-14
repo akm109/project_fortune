@@ -79,14 +79,9 @@ func blacken(border: ColorRect):
 	border.set_z_index(1)
 
 
-
 func show_number():
 	number.set_text(str(show_numb))
 	number.set_visible(true)
-
-
-func _on_number_placed(cell_id:int ):
-	pass
 
 
 func is_mouse_in() -> bool:

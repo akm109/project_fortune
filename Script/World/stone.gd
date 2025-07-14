@@ -24,7 +24,6 @@ var heritage: Dictionary ={
 
 
 signal dropped(stone)
-signal stone_stopped(stone)
 signal taken(stone)
 
 func _ready() -> void:

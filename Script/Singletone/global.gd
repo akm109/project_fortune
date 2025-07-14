@@ -14,13 +14,6 @@ func _ready() -> void:
 	bag_rocks = const_rocks.duplicate(true)
 
 
-func _process(delta: float) -> void:
-	if hovered_cell != null and hovered_cell != perv_cell:
-		print(hovered_cell, "ABOBA")
-		print(hovered_cell.get_global_position(),"   POPINA  ", hovered_cell.get_global_mouse_position())
-		perv_cell = hovered_cell
-
-
 func make_base_rock_set() -> Array[Array]:
 	var base_rocks: Array[Array]
 	base_rocks.resize(81)
