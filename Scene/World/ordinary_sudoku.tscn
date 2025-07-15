@@ -15,3 +15,13 @@ theme_override_constants/v_separation = 0
 columns = 9
 script = ExtResource("2_vsxe6")
 metadata/_edit_use_anchors_ = true
+
+[node name="UndoTimer" type="Timer" parent="."]
+wait_time = 0.3
+one_shot = true
+
+[node name="UndoCooldownTimer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+
+[connection signal="timeout" from="UndoTimer" to="." method="_on_undo_timer_timeout"]

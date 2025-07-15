@@ -31,7 +31,7 @@ func _ready() -> void:
 		hint.label_settings.set_font_color(Color.BLACK)
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if is_mouse_in():
 		if Input.is_action_pressed("RMB") and not already_changed:
 			here.emit(self)
@@ -51,7 +51,8 @@ func _input(event: InputEvent) -> void:
 
 func assign_id(pop:int)->void:
 	ID = pop
-	await ready
+	if not is_node_ready():
+		await ready
 	var bottom_list:Array= []
 	for i in range(9):
 		bottom_list.append(18+i)

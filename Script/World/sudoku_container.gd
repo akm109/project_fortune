@@ -3,6 +3,9 @@ extends GridContainer
 class_name Sudoku
 
 @onready var cell_path = SLib.globalize_path("res://Scene/World/cell.tscn")
+@onready var undo_timer: Timer = $UndoTimer
+@onready var undo_cooldown_timer: Timer = $UndoCooldownTimer
+
 
 var solution:Array[Array]
 var reduced_solution:Array[Array]
@@ -10,12 +13,16 @@ var cells:Array[Control]
 var highlighted_hint: int
 var all_white: bool
 var shown_numbers: Array[Array]
+var undo_list: Array[Array] =[]
+var unlimited_undo: bool = false
+
 
 func _ready()-> void:
 	cells.resize(81)
 	for i in range(81):
 		var cell = load(cell_path).instantiate()
 		cell.assign_id(i)
+		cell.here.connect(_on_here)
 		add_child(cell)
 		cells[i] = cell
 	solution.resize(9)
@@ -37,6 +44,96 @@ func _ready()-> void:
 	assign_numbers()
 	delete_init_hints()
 	shown_numbers = reduced_solution.duplicate()
+
+
+func _process(_delta: float) -> void:
+	
+	if Input.is_action_pressed("ui_undo") and unlimited_undo and undo_cooldown_timer.is_stopped():
+		un_do()
+		undo_cooldown_timer.start()
+		print("asdasd")
+
+
+func _input(event: InputEvent) -> void:
+
+	if event.is_action_pressed("hint_1"):
+		highlight_hints(1)
+	if event.is_action_pressed("hint_2"):
+		highlight_hints(2)
+	if event.is_action_pressed("hint_3"):
+		highlight_hints(3)
+	if event.is_action_pressed("hint_4"):
+		highlight_hints(4)
+	if event.is_action_pressed("hint_5"):
+		highlight_hints(5)
+	if event.is_action_pressed("hint_6"):
+		highlight_hints(6)
+	if event.is_action_pressed("hint_7"):
+		highlight_hints(7)
+	if event.is_action_pressed("hint_8"):
+		highlight_hints(8)
+	if event.is_action_pressed("hint_9"):
+		highlight_hints(9)
+	
+	if event.is_action("RMB"):
+		Global.paint_mode = "none"
+	
+	if event.is_action_released("ui_undo"):
+		undo_timer.stop()
+		await undo_timer.timeout
+		unlimited_undo = false
+	
+	if event.is_action_pressed("ui_undo") and not unlimited_undo:
+		un_do()
+		undo_timer.start()
+
+
+
+func _on_here(cell: Cell)-> void:
+	var hint_to_change: int = Global.choosen_hint                                                                                   # what hint do we want to place
+	@warning_ignore("integer_division")
+	var cell_location: Array[int] = [int(cell.ID/9),cell.ID%9]                                                                      # where do we want to place it
+
+	if hint_to_change == -1: 
+		return                                                                                                                      # did we even choosen hint?
+	if cell.numb != 0 or not check_loyalty(hint_to_change, cell_location , shown_numbers):          # check if there is a number in cell or is it legel to place such number here
+		return
+
+	var is_hint_visible: bool = cell.hints[hint_to_change-1].is_visible()
+	if Global.paint_mode == "none":
+		if is_hint_visible:
+			Global.paint_mode = "erase"
+		else:
+			Global.paint_mode = "paint"
+
+	if Global.paint_mode == "paint":
+		cell.back.set_color(Color(0.7, 0.95, 1.0))
+		cell.hints[hint_to_change-1].set_visible(true)
+	else:
+		cell.back.set_color(Color.WHITE)
+		cell.hints[hint_to_change-1].set_visible(false)
+	undo_list.append([cell.ID,hint_to_change, is_hint_visible])
+
+
+#undo hint erasing/painting
+func un_do():
+	if not undo_list.is_empty():
+		var to_undo: Array = undo_list.pop_back()
+		var cell : Cell = cells[to_undo[0]]
+		var hint_numb: int = to_undo[1]
+		var to_hide: bool  = to_undo[2]
+		var hint: Label = cell.hints[hint_numb-1]
+		hint.set_visible(to_hide)
+		if Global.choosen_hint == hint_numb:
+			hint.label_settings.set_font_color(Color.RED)
+			cell.back.set_color(Color(0.7, 0.95, 1.0))
+		else:
+			hint.label_settings.set_font_color(Color.BLACK)
+			cell.back.set_color(Color.WHITE)
+
+
+func _on_undo_timer_timeout() -> void:
+	unlimited_undo = true
 
 
 func highlight_hints(hint_ID:int):
@@ -178,7 +275,9 @@ func check_repeating_number_col(attempted_number:int, index:Array[int], matrix: 
 
 func check_repeating_number_in_box(attempted_number:int, index:Array[int], matrix: Array[Array])-> bool:
 	# Will check for any repeating number in a box
+	@warning_ignore("integer_division")
 	var box_row = int(index[0] / 3)
+	@warning_ignore("integer_division")
 	var box_col = int(index[1] / 3)
 	for row in range(box_row * 3, box_row * 3 + 3):
 		for col in range(box_col * 3, box_col * 3 + 3):
