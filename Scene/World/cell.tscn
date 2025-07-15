@@ -1,6 +1,6 @@
 [gd_scene load_steps=23 format=3 uid="uid://dmuyrsrqg4sxm"]
 
-[ext_resource type="Script" uid="uid://dsc6n855lhvm8" path="res://Script/World/block.gd" id="2_7t761"]
+[ext_resource type="Script" uid="uid://dsc6n855lhvm8" path="res://Script/World/cell.gd" id="2_7t761"]
 
 [sub_resource type="Theme" id="Theme_lr26m"]
 Label/colors/font_color = Color(0, 0, 0, 1)

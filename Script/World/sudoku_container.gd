@@ -33,7 +33,7 @@ func _ready()-> void:
 		for col in range(9):
 			reduced_solution[row][col] = solution[row][col]
 	reduced_solution = solution
-	reduct_numbers(randi_range(50,61))
+	reduct_numbers(randi_range(40,50))
 	assign_numbers()
 	delete_init_hints()
 	shown_numbers = reduced_solution.duplicate()
@@ -64,7 +64,7 @@ func highlight_hints(hint_ID:int):
 	highlighted_hint = hint_ID                                        #remember what we highlighted later to unhighlight later if needed
 
 
-func unhighlight_hints()-> void:
+func unhighlight_hints()-> void:                                      #Just make it as it was from begining
 	for cell in cells:
 		cell.back.set_color(Color.WHITE)
 		for hint in cell.hints:
@@ -104,7 +104,7 @@ func delete_hints()-> void:
 	for cell in cells:
 		var row = int(cell.ID/9)
 		var col = cell.ID % 9
-		if cell.show_numb == 0:
+		if cell.numb == 0:                                                
 			for possible_values in range(1,10):
 				if !check_loyalty(possible_values,[row,col], shown_numbers):
 					cell.hints[possible_values-1].hide()
@@ -117,7 +117,7 @@ func delete_init_hints()-> void:
 	for cell in cells:
 		var row = int(cell.ID/9)
 		var col = cell.ID % 9
-		if cell.show_numb == 0:
+		if cell.numb == 0:
 			for possible_values in range(1,10):
 				if !check_loyalty(possible_values,[row,col], reduced_solution):
 					cell.hints[possible_values-1].hide()

@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 SLib="*res://addons/SLib/SLib.gd"
 Global="*res://Scene/Singletone/global.tscn"
+BattleHandler="*res://Scene/Singletone/BattleHandler.tscn"
 
 [display]
 

@@ -6,11 +6,13 @@ var bag_rocks: Array[Array]
 var types:Array[String]= ["attack","deffend","magic","special"]
 var hovered_cell: Cell
 var choosen_hint: int = -1
+var paint_mode: String = "none"
 
 
 func _ready() -> void:
 	if const_rocks == []:
 		const_rocks = make_base_rock_set()
+		const_rocks.shuffle()
 	bag_rocks = const_rocks.duplicate(true)
 
 

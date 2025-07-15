@@ -12,10 +12,11 @@ class_name Cell
 
 
 var ID: int
-var show_numb:= 0
+var numb:= 0
 var hints:Array[Label]
 var type: String
-
+var init_number: bool
+var already_changed: bool = false
 
 signal here(cell: Cell)
 
@@ -30,15 +31,22 @@ func _ready() -> void:
 		hint.label_settings.set_font_color(Color.BLACK)
 
 
+func _process(delta: float) -> void:
+	if is_mouse_in():
+		if Input.is_action_pressed("RMB") and not already_changed:
+			here.emit(self)
+			already_changed = true
+
+
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		if is_mouse_in():
 			Global.hovered_cell = self
 		elif Global.hovered_cell == self:
 			Global.hovered_cell = null
-	if event.is_action_pressed("RMB"):
-		if is_mouse_in():
-			here.emit(self)
+	
+	if event.is_action_released("RMB"):
+		already_changed = false
 
 
 func assign_id(pop:int)->void:
@@ -74,7 +82,7 @@ func assign_id(pop:int)->void:
 
 func assign_number(dop:int, cop:String)-> void:
 	number.set_text(str(dop))
-	show_numb = dop
+	numb = dop
 	type = cop
 	match type:
 		"attack":
@@ -90,7 +98,7 @@ func assign_number(dop:int, cop:String)-> void:
 
 
 func delete_number()-> void:
-	show_numb = 0
+	numb = 0
 	number.set_text("")
 
 
@@ -100,7 +108,7 @@ func blacken(border: ColorRect)-> void:
 
 
 func show_number()-> void:
-	number.set_text(str(show_numb))
+	number.set_text(str(numb))
 	number.set_visible(true)
 
 

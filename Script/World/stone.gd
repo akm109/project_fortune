@@ -60,12 +60,12 @@ func focuse(foc: bool) -> void:
 func assign_heritage() -> void:
 	if not is_node_ready():
 		await ready                                                    # wait a little so nothing brokes when we trie to do smth 
-	var choosen_rock = Global.bag_rocks.pick_random().duplicate()  # I want marble just like yours but mine
-	Global.bag_rocks.erase(choosen_rock)                           # Throw away your marble
+	var choosen_rock = Global.bag_rocks.pick_random().duplicate()                    # I want marble just like yours but mine
+	Global.bag_rocks.erase(choosen_rock)
 	heritage.type = choosen_rock[1]
 	heritage.number = choosen_rock[0]
 	label.text = str(heritage.number)
-	match_color(heritage.type)                                     # Now stone looks just like that marble
+	match_color(heritage.type)                                         # Now stone looks just like that marble
 
 
 func match_color(type:String):
