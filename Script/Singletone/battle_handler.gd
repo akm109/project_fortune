@@ -14,7 +14,6 @@ var player_stats: Dictionary = {
 }
 
 
-
 func _on_placed_stone(stone: Stone):
 	var type = stone.heritage.type
 	var number = stone.heritage.number
