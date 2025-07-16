@@ -51,6 +51,15 @@ func _on_stone_dropped(stone: Stone):
 			@warning_ignore("integer_division")
 			ordinary_sudoku.shown_numbers[cell.ID/9][cell.ID%9] = stone.heritage.number
 			ordinary_sudoku.delete_hints()
+			var cells: Array = ordinary_sudoku.cells
+			var row: int = cell.ID/9
+			var col: int = cell.ID % 9
+			for i in range(9):
+				cells[row * 9 + i].back.set_color(Color.WHITE)                             # Bleaching the row
+				cells[col + i*9].back.set_color(Color.WHITE)                               # Bleachihng the col
+			for i in range(row/3*3, row/3*3+3):
+				for j in range(col/3*3, col/3*3+3):
+					cells[i*9 + j].back.set_color(Color.WHITE)                             # Bleaching the box
 			stone.hide()
 			stone.set_global_position(bag.global_position)
 			stone.in_bag = true
