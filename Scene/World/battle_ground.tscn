@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://necinktroavg"]
+[gd_scene load_steps=5 format=3 uid="uid://necinktroavg"]
 
 [ext_resource type="PackedScene" uid="uid://cc8tw7s2nevni" path="res://Scene/World/ordinary_sudoku.tscn" id="1_km1vx"]
 [ext_resource type="Script" uid="uid://xp6fb0u7060e" path="res://Script/World/battle_ground.gd" id="1_ktiin"]
 [ext_resource type="Texture2D" uid="uid://wnstcvivlewf" path="res://icon.svg" id="2_xcvva"]
+[ext_resource type="PackedScene" uid="uid://balqqrtypcccr" path="res://Scene/Player/player.tscn" id="4_ktiin"]
 
 [node name="BattleGround" type="Control"]
 layout_mode = 3
@@ -23,6 +24,24 @@ offset_right = -0.0800781
 offset_bottom = -0.480103
 alignment = 1
 metadata/_edit_use_anchors_ = true
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer2"]
+layout_mode = 2
+columns = 2
+
+[node name="EnemyHealthProgressBar" type="TextureProgressBar" parent="VBoxContainer2/GridContainer"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+nine_patch_stretch = true
+texture_under = ExtResource("2_xcvva")
+tint_under = Color(1, 0, 0, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="EnemyHealthLabel" type="Label" parent="VBoxContainer2/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "100/100"
 
 [node name="CenterContainer2" type="CenterContainer" parent="VBoxContainer2"]
 layout_mode = 2
@@ -122,8 +141,10 @@ metadata/_edit_use_anchors_ = true
 [node name="Control" type="Control" parent="VBoxContainer/CenterContainer"]
 layout_mode = 2
 
-[node name="Player" type="Sprite2D" parent="VBoxContainer/CenterContainer/Control"]
-texture = ExtResource("2_xcvva")
+[node name="Player" parent="VBoxContainer/CenterContainer/Control" instance=ExtResource("4_ktiin")]
+scale = Vector2(9, 9)
+is_in_battle = true
+camera_on = false
 
 [node name="CenterContainer2" type="CenterContainer" parent="VBoxContainer"]
 layout_mode = 2

@@ -7,8 +7,13 @@ class_name Sudoku
 @onready var undo_cooldown_timer: Timer = $UndoCooldownTimer
 
 
+var true_solution:Array[Array]
 var solution:Array[Array]
+var reverse_solution:Array[Array]
 var reduced_solution:Array[Array]
+var cant_solve: Array[Array]
+var count: int = 50
+var bount: int = 0
 var cells:Array[Control]
 var highlighted_hint: int
 var all_white: bool
@@ -27,23 +32,22 @@ func _ready()-> void:
 		cells[i] = cell
 	solution.resize(9)
 	reduced_solution.resize(9)
+	cant_solve.resize(9)
 	for row in range(9):
-		reduced_solution[row] = []
+		cant_solve[row].resize(9)
 		reduced_solution[row].resize(9)
-		solution[row] = []
 		solution[row].resize(9)
 		for col in range(9):
 			solution[row][col] = 0
+			cant_solve[row][col] = false
 	solve()
 	solution = randomize_sol(solution)
-	for row in range(9):
-		for col in range(9):
-			reduced_solution[row][col] = solution[row][col]
-	reduced_solution = solution
-	reduct_numbers(randi_range(40,50))
+	reduced_solution = solution.duplicate(true)
+	true_solution = solution.duplicate(true)
+	reduct_numbers()
 	assign_numbers()
 	delete_init_hints()
-	shown_numbers = reduced_solution.duplicate()
+	shown_numbers = reduced_solution.duplicate(true)
 
 
 func _process(_delta: float) -> void:
@@ -51,7 +55,6 @@ func _process(_delta: float) -> void:
 	if Input.is_action_pressed("ui_undo") and unlimited_undo and undo_cooldown_timer.is_stopped():
 		un_do()
 		undo_cooldown_timer.start()
-		print("asdasd")
 
 
 func _input(event: InputEvent) -> void:
@@ -75,7 +78,7 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("hint_9"):
 		highlight_hints(9)
 	
-	if event.is_action("RMB"):
+	if event.is_action_released("RMB"):
 		Global.paint_mode = "none"
 	
 	if event.is_action_released("ui_undo"):
@@ -172,21 +175,30 @@ func unhighlight_hints()-> void:                                      #Just make
 	Global.choosen_hint = -1
 
 
-func print_matrix(matrix:Array[Array])-> void:                        # pretty matrix  print
-	print("\n")
-	for row in matrix:
-		print(row)
-	print("\n")
+func reduct_numbers()-> bool:
+	var row:int = randi()%9
+	var col:int = randi()%9
+	for i in range(cant_solve.size()):
+		if not cant_solve[i].has(false):
+			for k in range(9):
+				for j in range(9):
+					cant_solve[k][j] = false
+			return true
+	while reduced_solution[row][col] == 0 or cant_solve[row][col]:                          # you cant delete nothingess
+		row = randi()%9
+		col = randi()%9
+	reduced_solution[row][col] = 0                                  # Finish him
+	solution = reduced_solution.duplicate(true)
+	reverse_solution = reduced_solution.duplicate(true)
+	solve()
+	reverse_solve()
+	if solution == reverse_solution and bount < count:
+		if reduct_numbers():
+			return true
+	cant_solve[row][col] = true
+	reduced_solution[row][col] = true_solution[row][col]
+	return false
 
-
-func reduct_numbers(count)-> void:
-	for i in range(count):                                              # delete count times numbers
-		var row = randi()%9
-		var col = randi()%9
-		while reduced_solution[row][col] == 0:                          # you cant delete nothingess
-			row = randi()%9
-			col = randi()%9
-		reduced_solution[row][col] = 0                                  # Finish him
 
 
 func assign_numbers()-> void:                                            # Show them what you got!
@@ -238,6 +250,24 @@ func solve() -> bool:
 			if solve():
 				return true
 			solution[row][col] = 0
+	return false
+
+
+func reverse_solve()->bool:
+	var row
+	var col
+	var find = find_empty(reverse_solution)
+	if find == [null]:
+		return true
+	else:
+		row = find[0]
+		col = find[1]
+	for possible_values in range(9,0,-1):
+		if check_loyalty(possible_values, [row, col], reverse_solution):
+			reverse_solution[row][col] = possible_values
+			if reverse_solve():
+				return true
+			reverse_solution[row][col] = 0
 	return false
 
 
@@ -389,3 +419,10 @@ func transpose(matrix:Array[Array])-> Array[Array]:
 		for col in range(matrix.size()):
 			answer[row][col]=buff[col][row]
 	return answer
+
+
+func print_matrix(matrix:Array[Array])-> void:                        # pretty matrix  print
+	print("\n")
+	for row in matrix:
+		print(row)
+	print("\n")

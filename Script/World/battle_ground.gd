@@ -7,6 +7,7 @@ extends Control
 @onready var ordinary_sudoku: GridContainer = $AspectRatioContainer/OrdinarySudoku
 @onready var stone_container: HBoxContainer = $Panel/StoneContainer
 @onready var bag: Sprite2D = $VBoxContainer/CenterContainer2/Control/Bag
+@onready var player: Player = $VBoxContainer/CenterContainer/Control/Player
 
 
 
@@ -17,6 +18,8 @@ var lying_stones:Array[Array]=[]
 
 
 func _ready() -> void:
+	player.is_in_battle = true
+	player.animation_player.play(&"idle")
 	lying_stones.resize(11)
 	var y_placement = (stone_container.get_rect().end - stone_container.get_rect().size/2).y
 	for i in range(11):
