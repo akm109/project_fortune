@@ -57,15 +57,22 @@ func focuse(foc: bool) -> void:
 		dropped.emit(self)
 
 
-func assign_heritage() -> void:
+func assign_heritage() -> String:
 	if not is_node_ready():
 		await ready                                                    # wait a little so nothing brokes when we trie to do smth 
+	if Global.bag_rocks == []:
+		Global.bag_is_empty = true
+		return "There is no rocks!"
 	var choosen_rock = Global.bag_rocks.pick_random().duplicate()                    # I want marble just like yours but mine
 	Global.bag_rocks.erase(choosen_rock)
 	heritage.type = choosen_rock[1]
 	heritage.number = choosen_rock[0]
 	label.text = str(heritage.number)
 	match_color(heritage.type)                                         # Now stone looks just like that marble
+	if Global.bag_rocks == []:
+		Global.bag_is_empty = true
+		return "There is no more rocks!"
+	return "OK"
 
 
 func match_color(type:String):

@@ -22,6 +22,8 @@ func _ready() -> void:
 	player.animation_player.play(&"idle")
 	lying_stones.resize(11)
 	var y_placement = (stone_container.get_rect().end - stone_container.get_rect().size/2).y
+	if Global.bag_is_empty:
+		return
 	for i in range(11):
 		var stone: Stone = stone_path.instantiate()
 		stone.assign_heritage()
@@ -82,14 +84,19 @@ func _on_button_toggled(toggled_on: bool) -> void:
 	if toggled_on:
 		pass
 
-# A button to thro stones back in bag and take new ones
+# A button to throw stones back in bag and take new ones from mentioned bag
 func _on_button_pressed() -> void:
 	Global.bag_rocks.append_array(lying_stones)
+	if Global.bag_is_empty:
+		return
 	lying_stones.clear()
 	lying_stones.resize(11)
 	for i in range(stones.size()):
 		var stone: Stone = stones[i]
-		stone.assign_heritage()
+		if await stone.assign_heritage() != "OK":
+			return
 		place_stones()
 		lying_stones[i]=[stone.heritage.number,stone.heritage.type]
 		stone.set_visible(true)
+	if Global.bag_rocks == []:
+		Global.bag_is_empty

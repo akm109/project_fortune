@@ -6,14 +6,14 @@ class_name Sudoku
 @onready var undo_timer: Timer = $UndoTimer
 @onready var undo_cooldown_timer: Timer = $UndoCooldownTimer
 
+@export var difficulty: int = 40
 
 var true_solution:Array[Array]
 var solution:Array[Array]
 var reverse_solution:Array[Array]
 var reduced_solution:Array[Array]
 var cant_solve: Array[Array]
-var count: int = 50
-var bount: int = 0
+var count: int
 var cells:Array[Control]
 var highlighted_hint: int
 var all_white: bool
@@ -175,30 +175,14 @@ func unhighlight_hints()-> void:                                      #Just make
 	Global.choosen_hint = -1
 
 
-func reduct_numbers()-> bool:
-	var row:int = randi()%9
-	var col:int = randi()%9
-	for i in range(cant_solve.size()):
-		if not cant_solve[i].has(false):
-			for k in range(9):
-				for j in range(9):
-					cant_solve[k][j] = false
-			return true
-	while reduced_solution[row][col] == 0 or cant_solve[row][col]:                          # you cant delete nothingess
-		row = randi()%9
-		col = randi()%9
-	reduced_solution[row][col] = 0                                  # Finish him
-	solution = reduced_solution.duplicate(true)
-	reverse_solution = reduced_solution.duplicate(true)
-	solve()
-	reverse_solve()
-	if solution == reverse_solution and bount < count:
-		if reduct_numbers():
-			return true
-	cant_solve[row][col] = true
-	reduced_solution[row][col] = true_solution[row][col]
-	return false
-
+func reduct_numbers():
+	for i in range(difficulty):
+		var row:int = randi()%9
+		var col:int = randi()%9
+		while reduced_solution[row][col] == 0:                          # you cant delete nothingess
+			row = randi()%9
+			col = randi()%9
+		reduced_solution[row][col] = 0                                  # Finish him
 
 
 func assign_numbers()-> void:                                            # Show them what you got!
