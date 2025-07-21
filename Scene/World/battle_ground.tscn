@@ -80,6 +80,7 @@ color = Color(0.08, 0.08, 0.08, 0.364706)
 
 [node name="OrdinarySudoku" parent="AspectRatioContainer" instance=ExtResource("1_km1vx")]
 layout_mode = 2
+difficulty = 51
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1

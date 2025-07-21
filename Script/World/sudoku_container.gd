@@ -5,8 +5,9 @@ class_name Sudoku
 @onready var cell_path = SLib.globalize_path("res://Scene/World/cell.tscn")
 @onready var undo_timer: Timer = $UndoTimer
 @onready var undo_cooldown_timer: Timer = $UndoCooldownTimer
+@onready var timer: Timer = $Timer
 
-@export var difficulty: int = 40
+@export var difficulty: int = 50
 
 var true_solution:Array[Array]
 var solution:Array[Array]
@@ -30,21 +31,11 @@ func _ready()-> void:
 		cell.here.connect(_on_here)
 		add_child(cell)
 		cells[i] = cell
-	solution.resize(9)
-	reduced_solution.resize(9)
-	cant_solve.resize(9)
-	for row in range(9):
-		cant_solve[row].resize(9)
-		reduced_solution[row].resize(9)
-		solution[row].resize(9)
-		for col in range(9):
-			solution[row][col] = 0
-			cant_solve[row][col] = false
-	solve()
-	solution = randomize_sol(solution)
-	reduced_solution = solution.duplicate(true)
-	true_solution = solution.duplicate(true)
-	reduct_numbers()
+	if difficulty > 49:
+		get_prepared_problem()
+	else:
+		generate_problem()
+	reduced_solution = randomize_sol(reduced_solution)
 	assign_numbers()
 	delete_init_hints()
 	shown_numbers = reduced_solution.duplicate(true)
@@ -175,6 +166,79 @@ func unhighlight_hints()-> void:                                      #Just make
 	Global.choosen_hint = -1
 
 
+func get_prepared_problem()-> void:
+	var problems: Array[Array]
+	var i : int = 0
+	var file:FileAccess
+	if difficulty != 50:
+		file = FileAccess.open("res://sudoku.txt", FileAccess.READ)
+		problems.resize(50)
+	else:
+		file = FileAccess.open("res://generated_sudoku.txt", FileAccess.READ)
+		problems.resize(117)
+	var contents = file.get_as_text()
+	while file.get_length() > file.get_position():
+		problems[i].resize(81)
+		var line: String = file.get_line()
+		for j in range(line.length()):
+			problems[i][j] = (int(line[j]))
+		i += 1
+	
+	var problem: Array = problems[4]
+	var sol: Array[Array]
+	sol.resize(9)
+	for k in range(9):
+		sol[k].resize(9)
+		for j in range(9):
+			sol[k][j] = (problem[k*9+j])
+	sol = replace_numbers(sol)
+	reduced_solution = sol 
+
+
+func generate_problem()-> void:
+	solution.resize(9)
+	reduced_solution.resize(9)
+	cant_solve.resize(9)
+	for row in range(9):
+		cant_solve[row].resize(9)
+		reduced_solution[row].resize(9)
+		solution[row].resize(9)
+		for col in range(9):
+			solution[row][col] = 0
+			cant_solve[row][col] = false
+	rand_solve()
+	reduced_solution = solution.duplicate(true)
+	true_solution = solution.duplicate(true)
+	while solution != reverse_solution:
+		reduct_numbers()
+		if solution != reverse_solution:
+			reduced_solution = true_solution.duplicate(true)
+		else:
+			break
+
+
+func replace_numbers(sol: Array[Array]):
+	var answer: Array[Array]
+	var numbers: Array[Array]
+	answer.resize(9)
+	numbers.resize(9)
+	for number in range(9):
+		numbers[number] = []
+	for row in range(9):
+		answer[row] = []
+		answer[row].resize(9)
+		for col in range(9):
+			answer[row][col] = 0
+			if sol[row][col] != 0:
+				numbers[sol[row][col]-1].append(row*9+col)
+	numbers.shuffle()
+	numbers.shuffle()
+	for i in range(numbers.size()):
+		for j in range(numbers[i].size()):
+			answer[int(numbers[i][j]/9)][numbers[i][j]%9] = i + 1
+	return answer
+
+
 func reduct_numbers():
 	for i in range(difficulty):
 		var row:int = randi()%9
@@ -183,6 +247,10 @@ func reduct_numbers():
 			row = randi()%9
 			col = randi()%9
 		reduced_solution[row][col] = 0                                  # Finish him
+	solution = reduced_solution.duplicate(true)
+	reverse_solution = reduced_solution.duplicate(true)
+	solve()
+	reverse_solve()
 
 
 func assign_numbers()-> void:                                            # Show them what you got!
@@ -255,6 +323,26 @@ func reverse_solve()->bool:
 	return false
 
 
+func rand_solve():
+	var row
+	var col
+	var find = find_empty(solution)
+	if find == [null]:
+		return true
+	else:
+		row = find[0]
+		col = find[1]
+	var pos_vals = range(1,10)
+	pos_vals.shuffle()
+	for possible_values in pos_vals:
+		if check_loyalty(possible_values, [row, col], solution):
+			solution[row][col] = possible_values
+			if rand_solve():
+				return true
+			solution[row][col] = 0
+	return false
+
+
 func check_loyalty(attempted_number:int, index:Array[int], matrix: Array[Array])-> bool:
 	if not check_repeating_number_row(attempted_number, index, matrix):
 		if not check_repeating_number_col(attempted_number, index, matrix):
@@ -273,7 +361,7 @@ func find_empty(matrix)->Array:
 
 func check_repeating_number_row(attempted_number:int, index:Array[int], matrix: Array[Array])-> bool:
 	# Will check for any of the same number in a column
-	for col in range(solution.size()):
+	for col in range(9):
 		if matrix[index[0]][col] == attempted_number and col != index[1]:
 			return true
 	return false
@@ -281,7 +369,7 @@ func check_repeating_number_row(attempted_number:int, index:Array[int], matrix: 
 
 func check_repeating_number_col(attempted_number:int, index:Array[int], matrix: Array[Array])-> bool:
 	# Will check for any repeating number in a row
-	for row in range(solution.size()):
+	for row in range(9):
 		if matrix[row][index[1]] == attempted_number and row != index[0]:
 			return true
 	return false
@@ -314,7 +402,7 @@ func validation_check()-> bool:
 
 func randomize_sol(matrix: Array[Array])-> Array[Array]:
 	var answer: Array[Array] = matrix.duplicate(true)
-	for i in range(100):
+	for i in range(1000):
 		var k: int
 		k = randi()%5
 		match k:

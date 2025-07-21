@@ -5,11 +5,25 @@ class_name Player
 const SPEED = 300.0
 
 
-@onready var animation_player: AnimationPlayer = $AnimationPlayer
-@onready var sprite_2d: Sprite2D = $Sprite2D
+@onready var sprite_2d: AnimatedSprite2D = $Sprite2D
 @onready var camera_2d: Camera2D = $Camera2D
 @export var is_in_battle: bool = false
 @export var camera_on: bool = true
+
+var stats: Dictionary={
+	"hp": 100,
+	"shield": 0,
+	"magick": 0,
+	"special": 0,
+	"effects": [],
+}
+
+
+enum States{
+	IDLE,
+	WALK,
+	DEAD,
+}
 
 
 func _ready() -> void:
@@ -37,8 +51,8 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	
 	var anim: StringName = choose_animation()
-	if animation_player.current_animation != anim :
-		animation_player.play(anim)
+	if sprite_2d.animation != anim :
+		sprite_2d.play(anim)
 
 
 func choose_animation():

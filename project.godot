@@ -35,7 +35,7 @@ enabled=PackedStringArray("res://addons/SLib/plugin.cfg")
 
 [global_group]
 
-Cell=""
+Player=""
 
 [gui]
 
