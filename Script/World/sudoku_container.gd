@@ -176,7 +176,6 @@ func get_prepared_problem()-> void:
 	else:
 		file = FileAccess.open("res://generated_sudoku.txt", FileAccess.READ)
 		problems.resize(117)
-	var contents = file.get_as_text()
 	while file.get_length() > file.get_position():
 		problems[i].resize(81)
 		var line: String = file.get_line()

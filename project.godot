@@ -36,6 +36,7 @@ enabled=PackedStringArray("res://addons/SLib/plugin.cfg")
 [global_group]
 
 Player=""
+Enemy=""
 
 [gui]
 

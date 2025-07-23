@@ -6,7 +6,6 @@ extends Control
 
 @onready var ordinary_sudoku: GridContainer = $AspectRatioContainer/OrdinarySudoku
 @onready var stone_container: HBoxContainer = $Panel/StoneContainer
-@onready var bag: Sprite2D = $VBoxContainer/CenterContainer2/Control/Bag
 @onready var player: Player = $VBoxContainer/CenterContainer/Control/Player
 
 
@@ -19,7 +18,7 @@ var lying_stones:Array[Array]=[]
 
 func _ready() -> void:
 	player.is_in_battle = true
-	player.animation_player.play(&"idle")
+	player.sprite_2d.play(&"idle")
 	lying_stones.resize(11)
 	var y_placement = (stone_container.get_rect().end - stone_container.get_rect().size/2).y
 	if Global.bag_is_empty:
@@ -66,10 +65,10 @@ func _on_stone_dropped(stone: Stone):
 				for j in range(col/3*3, col/3*3+3):
 					cells[i*9 + j].back.set_color(Color.WHITE)                             # Bleaching the box
 			stone.hide()
-			stone.set_global_position(bag.global_position)
+			stone.set_global_position(stone_recess[stone.ID])
 			stone.in_bag = true
 			lying_stones.erase([stone.heritage.number,stone.heritage.type])
-			BattleHandler._on_placed_stone(stone)
+			#BattleHandler._on_placed_stone(stone)
 	else:
 		ordinary_sudoku.unhighlight_hints()
 
@@ -94,9 +93,9 @@ func _on_button_pressed() -> void:
 	for i in range(stones.size()):
 		var stone: Stone = stones[i]
 		if await stone.assign_heritage() != "OK":
-			return
+			break
 		place_stones()
 		lying_stones[i]=[stone.heritage.number,stone.heritage.type]
 		stone.set_visible(true)
 	if Global.bag_rocks == []:
-		Global.bag_is_empty
+		Global.bag_is_empty = true

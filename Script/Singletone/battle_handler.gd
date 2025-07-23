@@ -1,9 +1,6 @@
 extends Node
 
 
-
-
-
 var enemies: Array[Enemy]
 var player: Player
 
@@ -22,7 +19,7 @@ func deal_damage(damage: int,times: int, target)-> void:
 		if target.stats.shield > 0:
 			target.stats.shield -= damage
 			if target.stats.shield < 0:
-				target.stats.hp += stats.shield
+				target.stats.hp += target.stats.shield
 				target.stats.shield = 0
 		else:
 			target.stats.hp -= damage
@@ -37,9 +34,11 @@ func _on_placed_stone(stone: Stone):
 	var number = stone.heritage.number
 	match type:
 		"attack":
-			deal_damage(number, 1, enemies[1])
+			pass
+			#deal_damage(number, 1, enemies[1])
 		"deffend":
-			apply_shield(number, player)
+			pass
+			#apply_shield(number, player)
 		"magick":
 			player.stats.magick += number
 		"special":

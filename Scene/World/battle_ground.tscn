@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://necinktroavg"]
+[gd_scene load_steps=6 format=3 uid="uid://necinktroavg"]
 
 [ext_resource type="PackedScene" uid="uid://cc8tw7s2nevni" path="res://Scene/World/ordinary_sudoku.tscn" id="1_km1vx"]
 [ext_resource type="Script" uid="uid://xp6fb0u7060e" path="res://Script/World/battle_ground.gd" id="1_ktiin"]
 [ext_resource type="Texture2D" uid="uid://wnstcvivlewf" path="res://icon.svg" id="2_xcvva"]
+[ext_resource type="PackedScene" uid="uid://y7f8cvumlh2h" path="res://Scene/Enemy/enemy_panel.tscn" id="3_nj6u8"]
 [ext_resource type="PackedScene" uid="uid://balqqrtypcccr" path="res://Scene/Player/player.tscn" id="4_ktiin"]
 
 [node name="BattleGround" type="Control"]
@@ -43,16 +44,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "100/100"
 
-[node name="CenterContainer2" type="CenterContainer" parent="VBoxContainer2"]
+[node name="EnemyContainer" type="GridContainer" parent="VBoxContainer2"]
 layout_mode = 2
 size_flags_vertical = 3
 metadata/_edit_use_anchors_ = true
 
-[node name="Control" type="Control" parent="VBoxContainer2/CenterContainer2"]
+[node name="EnemyPanel" parent="VBoxContainer2/EnemyContainer" instance=ExtResource("3_nj6u8")]
 layout_mode = 2
-
-[node name="Enemy" type="Sprite2D" parent="VBoxContainer2/CenterContainer2/Control"]
-texture = ExtResource("2_xcvva")
 
 [node name="Button" type="Button" parent="VBoxContainer2"]
 layout_mode = 2
@@ -92,8 +90,6 @@ metadata/_edit_use_anchors_ = true
 
 [node name="GridContainer" type="GridContainer" parent="VBoxContainer"]
 layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 0.35
 columns = 2
 
 [node name="TextureProgressBar" type="TextureProgressBar" parent="VBoxContainer/GridContainer"]
@@ -146,20 +142,6 @@ layout_mode = 2
 scale = Vector2(9, 9)
 is_in_battle = true
 camera_on = false
-
-[node name="CenterContainer2" type="CenterContainer" parent="VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-metadata/_edit_use_anchors_ = true
-
-[node name="Control" type="Control" parent="VBoxContainer/CenterContainer2"]
-layout_mode = 2
-
-[node name="Bag" type="Sprite2D" parent="VBoxContainer/CenterContainer2/Control"]
-self_modulate = Color(0.41, 0.24395, 0.041, 1)
-z_index = 2
-scale = Vector2(3.665, 3.665)
-texture = ExtResource("2_xcvva")
 
 [node name="Panel" type="ColorRect" parent="."]
 z_index = -4

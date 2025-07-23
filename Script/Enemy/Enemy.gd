@@ -9,9 +9,10 @@ class_name Enemy
 	"hp": 10,
 	"attack": 1,
 	"defense": 1,
+	"effects": []
 }
 
-@export var move_set: Dictionary={
+@export var move_set: Dictionary = {
 	"attack_st": {
 		"type":"attack",
 		"amount": 10,
@@ -38,6 +39,11 @@ class_name Enemy
 		"weight": 0.0
 	},
 }
+
+@export var pals: Dictionary = {
+	"pal_path_1": "res://Scene/Enemy/enemy.tscn"
+}
+
 @export_subgroup("World_values")
 @export var agro_range: float = 500.0
 @export var guard_point: Marker2D
@@ -56,6 +62,7 @@ func _physics_process(delta: float) -> void:
 
 
 func make_move()-> void:
+	pick_move()
 # If move applies buff/debuff, whe should apply it
 	if current_move.has("special"):
 		match current_move.special:
@@ -72,7 +79,7 @@ func make_move()-> void:
 func pick_move() -> void:
 # If preious move belongs to sequence it has sequence_name we should choose next move that belongs to this sequence
 	if previous_move.has("sequence_name"):
-# Check if move can be compared by this key
+# Check if move has sequence keys
 			for move in move_set:
 				if move.has("sequence_name"):
 # We need move that belongs to choosen sequence and and is next compared to previous move
@@ -100,5 +107,6 @@ func pick_move() -> void:
 
 
 func _on_body_entered(body: Node2D) -> void:
+	BattleHandler.enemies.append(self)
 	if body.is_in_group("Player"):
 		start_battle.emit(self)
