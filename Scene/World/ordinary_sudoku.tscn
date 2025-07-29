@@ -14,6 +14,7 @@ theme_override_constants/h_separation = 0
 theme_override_constants/v_separation = 0
 columns = 9
 script = ExtResource("2_vsxe6")
+difficulty = 320
 metadata/_edit_use_anchors_ = true
 
 [node name="UndoTimer" type="Timer" parent="."]

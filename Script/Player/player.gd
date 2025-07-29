@@ -18,6 +18,7 @@ var stats: Dictionary={
 	"effects": [],
 }
 
+var dead: bool
 
 enum States{
 	IDLE,

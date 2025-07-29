@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://necinktroavg"]
+[gd_scene load_steps=7 format=3 uid="uid://necinktroavg"]
 
 [ext_resource type="PackedScene" uid="uid://cc8tw7s2nevni" path="res://Scene/World/ordinary_sudoku.tscn" id="1_km1vx"]
 [ext_resource type="Script" uid="uid://xp6fb0u7060e" path="res://Script/World/battle_ground.gd" id="1_ktiin"]
 [ext_resource type="Texture2D" uid="uid://wnstcvivlewf" path="res://icon.svg" id="2_xcvva"]
 [ext_resource type="PackedScene" uid="uid://y7f8cvumlh2h" path="res://Scene/Enemy/enemy_panel.tscn" id="3_nj6u8"]
 [ext_resource type="PackedScene" uid="uid://balqqrtypcccr" path="res://Scene/Player/player.tscn" id="4_ktiin"]
+[ext_resource type="Script" uid="uid://kw3ruvb0cbki" path="res://Script/World/Battle_sudoku.gd" id="4_l4i1r"]
 
 [node name="BattleGround" type="Control"]
 layout_mode = 3
@@ -49,7 +50,7 @@ layout_mode = 2
 size_flags_vertical = 3
 metadata/_edit_use_anchors_ = true
 
-[node name="EnemyPanel" parent="VBoxContainer2/EnemyContainer" instance=ExtResource("3_nj6u8")]
+[node name="MainEnemyPanel" parent="VBoxContainer2/EnemyContainer" instance=ExtResource("3_nj6u8")]
 layout_mode = 2
 
 [node name="Button" type="Button" parent="VBoxContainer2"]
@@ -57,7 +58,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 76
 text = "END TURN"
 
-[node name="AspectRatioContainer" type="AspectRatioContainer" parent="."]
+[node name="BattleSudoku" type="AspectRatioContainer" parent="."]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.25
@@ -68,15 +69,16 @@ offset_bottom = -0.120056
 grow_horizontal = 2
 grow_vertical = 2
 alignment_vertical = 2
+script = ExtResource("4_l4i1r")
 metadata/_edit_use_anchors_ = true
 
-[node name="Panel" type="ColorRect" parent="AspectRatioContainer"]
+[node name="Panel" type="ColorRect" parent="BattleSudoku"]
 visible = false
 z_index = -4
 layout_mode = 2
 color = Color(0.08, 0.08, 0.08, 0.364706)
 
-[node name="OrdinarySudoku" parent="AspectRatioContainer" instance=ExtResource("1_km1vx")]
+[node name="OrdinarySudoku" parent="BattleSudoku" instance=ExtResource("1_km1vx")]
 layout_mode = 2
 difficulty = 51
 
@@ -92,58 +94,59 @@ metadata/_edit_use_anchors_ = true
 layout_mode = 2
 columns = 2
 
-[node name="TextureProgressBar" type="TextureProgressBar" parent="VBoxContainer/GridContainer"]
+[node name="HealthBar" type="TextureProgressBar" parent="VBoxContainer/GridContainer"]
 custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 nine_patch_stretch = true
 texture_under = ExtResource("2_xcvva")
-tint_under = Color(1, 0, 0, 1)
+texture_progress = ExtResource("2_xcvva")
+tint_progress = Color(1, 0, 0, 1)
 metadata/_edit_use_anchors_ = true
 
-[node name="Label" type="Label" parent="VBoxContainer/GridContainer"]
+[node name="HealthLabel" type="Label" parent="VBoxContainer/GridContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "100"
 
-[node name="TextureProgressBar2" type="TextureProgressBar" parent="VBoxContainer/GridContainer"]
+[node name="ManaBar" type="TextureProgressBar" parent="VBoxContainer/GridContainer"]
 layout_mode = 2
 nine_patch_stretch = true
 texture_under = ExtResource("2_xcvva")
 tint_under = Color(0, 0, 1, 1)
 metadata/_edit_use_anchors_ = true
 
-[node name="Label2" type="Label" parent="VBoxContainer/GridContainer"]
+[node name="ManaLabel" type="Label" parent="VBoxContainer/GridContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "100"
 
-[node name="TextureProgressBar3" type="TextureProgressBar" parent="VBoxContainer/GridContainer"]
+[node name="SpecialBar" type="TextureProgressBar" parent="VBoxContainer/GridContainer"]
 layout_mode = 2
 nine_patch_stretch = true
 texture_under = ExtResource("2_xcvva")
 tint_under = Color(0, 1, 0, 1)
 metadata/_edit_use_anchors_ = true
 
-[node name="Label3" type="Label" parent="VBoxContainer/GridContainer"]
+[node name="SpecialLabel" type="Label" parent="VBoxContainer/GridContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "100"
 
-[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer"]
+[node name="PlayerContainer" type="CenterContainer" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 metadata/_edit_use_anchors_ = true
 
-[node name="Control" type="Control" parent="VBoxContainer/CenterContainer"]
+[node name="Control" type="Control" parent="VBoxContainer/PlayerContainer"]
 layout_mode = 2
 
-[node name="Player" parent="VBoxContainer/CenterContainer/Control" instance=ExtResource("4_ktiin")]
+[node name="Player" parent="VBoxContainer/PlayerContainer/Control" instance=ExtResource("4_ktiin")]
 scale = Vector2(9, 9)
 is_in_battle = true
 camera_on = false
 
-[node name="Panel" type="ColorRect" parent="."]
+[node name="StoneContainer" type="ColorRect" parent="."]
 z_index = -4
 layout_mode = 2
 anchor_left = 0.253
@@ -155,12 +158,4 @@ offset_top = -0.440063
 offset_right = -0.240112
 color = Color(0.08, 0.08, 0.08, 0.364706)
 
-[node name="StoneContainer" type="HBoxContainer" parent="Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[connection signal="pressed" from="VBoxContainer2/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="VBoxContainer2/Button" to="BattleSudoku" method="_on_button_pressed"]

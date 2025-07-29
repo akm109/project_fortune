@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b820yacqg3ub3"]
+
+[ext_resource type="Script" uid="uid://v7b5s7o84ax1" path="res://Tools/SudokuGenerator.gd" id="1_lpdoa"]
+
+[node name="Node" type="Node"]
+script = ExtResource("1_lpdoa")

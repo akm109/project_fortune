@@ -1,0 +1,98 @@
+extends AspectRatioContainer
+
+
+@onready var ordinary_sudoku: GridContainer = $OrdinarySudoku
+
+
+
+var stone_container
+var stone_path = load(SLib.globalize_path("res://Scene/World/stone.tscn"))
+var stones :Array[Stone] 
+var stone_recess: Array[Vector2]
+var lying_stones:Array[Array]=[]
+
+
+
+
+func _ready() -> void:
+	await get_parent().ready
+	lying_stones.resize(11)
+	var y_placement = (stone_container.get_rect().end - stone_container.get_rect().size/2).y
+	if Global.bag_is_empty:
+		return
+	for i in range(11):
+		var stone: Stone = stone_path.instantiate()
+		stone.assign_heritage()
+		stone.dropped.connect(_on_stone_dropped)
+		stone.taken.connect(_on_taken)
+		stone_container.add_child(stone)
+		stone.global_position.y = y_placement
+		stones.append(stone)
+		lying_stones[i]= [stone.heritage.number,stone.heritage.type]
+		stones[i].ID = i
+	place_stones()
+
+
+func place_stones():
+	if stone_recess.size() != 11:
+		stone_recess.resize(11)
+		for i in range(stone_recess.size()):
+			stones[i].position.x = (i+0.5)*stone_container.get_rect().size.x/(stone_recess.size())
+			stone_recess[i] = stones[i].global_position
+	else:
+		for i in range(stones.size()):
+			stones[i].global_position = stone_recess[i]
+
+
+func _on_stone_dropped(stone: Stone):
+	if Global.hovered_cell != null:
+		var cell: Cell = Global.hovered_cell
+		if cell.numb == 0:
+			cell.assign_number(stone.heritage.number, stone.heritage.type)
+			@warning_ignore("integer_division")
+			ordinary_sudoku.shown_numbers[cell.ID/9][cell.ID%9] = stone.heritage.number
+			ordinary_sudoku.delete_hints()
+			var cells: Array = ordinary_sudoku.cells
+			@warning_ignore("integer_division")
+			var row: int = cell.ID/9
+			var col: int = cell.ID % 9
+			for i in range(9):
+				cells[row * 9 + i].back.set_color(Color.WHITE)                             # Bleaching the row
+				cells[col + i*9].back.set_color(Color.WHITE)                               # Bleachihng the col
+			@warning_ignore("integer_division")
+			for i in range(row/3*3, row/3*3+3):
+				@warning_ignore("integer_division")
+				for j in range(col/3*3, col/3*3+3):
+					cells[i*9 + j].back.set_color(Color.WHITE)                             # Bleaching the box
+			stone.hide()
+			stone.set_global_position(stone_recess[stone.ID])
+			stone.in_bag = true
+			lying_stones.erase([stone.heritage.number,stone.heritage.type])
+			BattleHandler._on_placed_stone(stone)
+	else:
+		ordinary_sudoku.unhighlight_hints()
+
+
+func _on_taken(stone: Stone)-> void:
+	await get_tree().create_timer(0.05).timeout
+	if Global.choosen_hint != stone.heritage.number:
+		ordinary_sudoku.highlight_hints(stone.heritage.number)
+
+
+# A button to throw stones back in bag and take new ones from mentioned bag
+func _on_button_pressed() -> void:
+	Global.bag_rocks.append_array(lying_stones)
+	if Global.bag_is_empty:
+		return
+	lying_stones.clear()
+	lying_stones.resize(11)
+	for i in range(stones.size()):
+		var stone: Stone = stones[i]
+		if await stone.assign_heritage() != "OK":
+			break
+		place_stones()
+		lying_stones[i]=[stone.heritage.number,stone.heritage.type]
+		stone.set_visible(true)
+	if Global.bag_rocks == []:
+		Global.bag_is_empty = true
+	BattleHandler._on_enemies_turn()

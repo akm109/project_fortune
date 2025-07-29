@@ -1,101 +1,41 @@
 extends Control
 
 
+@onready var player: Player = $VBoxContainer/PlayerContainer/Control/Player
+@onready var battle_sudoku: AspectRatioContainer = $BattleSudoku
+@onready var stone_container: ColorRect = $StoneContainer
+@onready var main_enemy_panel: TextureButton = $VBoxContainer2/EnemyContainer/MainEnemyPanel
+#BAR AND LABEL OF ENEMY
+@onready var enemy_health_progress_bar: TextureProgressBar = $VBoxContainer2/GridContainer/EnemyHealthProgressBar
+@onready var enemy_health_label: Label = $VBoxContainer2/GridContainer/EnemyHealthLabel
+#BARs AND LABELS OF PALYER
+@onready var health_bar: TextureProgressBar = $VBoxContainer/GridContainer/HealthBar
+@onready var health_label: Label = $VBoxContainer/GridContainer/HealthLabel
+@onready var mana_bar: TextureProgressBar = $VBoxContainer/GridContainer/ManaBar
+@onready var mana_label: Label = $VBoxContainer/GridContainer/ManaLabel
+@onready var special_label: Label = $VBoxContainer/GridContainer/SpecialLabel
 
 
-
-@onready var ordinary_sudoku: GridContainer = $AspectRatioContainer/OrdinarySudoku
-@onready var stone_container: HBoxContainer = $Panel/StoneContainer
-@onready var player: Player = $VBoxContainer/CenterContainer/Control/Player
-
-
-
-var stone_path = load(SLib.globalize_path("res://Scene/World/stone.tscn"))
-var stones :Array[Stone] 
-var stone_recess: Array[Vector2]
-var lying_stones:Array[Array]=[]
+signal battle_ended
 
 
 func _ready() -> void:
 	player.is_in_battle = true
 	player.sprite_2d.play(&"idle")
-	lying_stones.resize(11)
-	var y_placement = (stone_container.get_rect().end - stone_container.get_rect().size/2).y
-	if Global.bag_is_empty:
-		return
-	for i in range(11):
-		var stone: Stone = stone_path.instantiate()
-		stone.assign_heritage()
-		stone.dropped.connect(_on_stone_dropped)
-		stone.taken.connect(_on_taken)
-		stone_container.add_child(stone)
-		stone.position.y = y_placement
-		stones.append(stone)
-		lying_stones[i]= [stone.heritage.number,stone.heritage.type]
-		stones[i].ID = i
-	place_stones()
+	battle_sudoku.stone_container = stone_container
+	BattleHandler.ui_updater = self
+	BattleHandler.player = player
 
 
-func place_stones():
-	if stone_recess.size() != 11:
-		stone_recess.resize(11)
-		for i in range(stone_recess.size()):
-			stones[i].position.x = (i+0.5)*stone_container.get_rect().size.x/(stone_recess.size())
-			stone_recess[i] = stones[i].global_position
-	else:
-		for i in range(stones.size()):
-			stones[i].global_position = stone_recess[i]
-
-
-func _on_stone_dropped(stone: Stone):
-	if Global.hovered_cell != null:
-		var cell: Cell = Global.hovered_cell
-		if cell.numb == 0:
-			cell.assign_number(stone.heritage.number, stone.heritage.type)
-			@warning_ignore("integer_division")
-			ordinary_sudoku.shown_numbers[cell.ID/9][cell.ID%9] = stone.heritage.number
-			ordinary_sudoku.delete_hints()
-			var cells: Array = ordinary_sudoku.cells
-			var row: int = cell.ID/9
-			var col: int = cell.ID % 9
-			for i in range(9):
-				cells[row * 9 + i].back.set_color(Color.WHITE)                             # Bleaching the row
-				cells[col + i*9].back.set_color(Color.WHITE)                               # Bleachihng the col
-			for i in range(row/3*3, row/3*3+3):
-				for j in range(col/3*3, col/3*3+3):
-					cells[i*9 + j].back.set_color(Color.WHITE)                             # Bleaching the box
-			stone.hide()
-			stone.set_global_position(stone_recess[stone.ID])
-			stone.in_bag = true
-			lying_stones.erase([stone.heritage.number,stone.heritage.type])
-			#BattleHandler._on_placed_stone(stone)
-	else:
-		ordinary_sudoku.unhighlight_hints()
-
-
-func _on_taken(stone: Stone)-> void:
-	await get_tree().create_timer(0.05).timeout
-	if Global.choosen_hint != stone.heritage.number:
-		ordinary_sudoku.highlight_hints(stone.heritage.number)
-
-
-func _on_button_toggled(toggled_on: bool) -> void:
-	if toggled_on:
-		pass
-
-# A button to throw stones back in bag and take new ones from mentioned bag
-func _on_button_pressed() -> void:
-	Global.bag_rocks.append_array(lying_stones)
-	if Global.bag_is_empty:
-		return
-	lying_stones.clear()
-	lying_stones.resize(11)
-	for i in range(stones.size()):
-		var stone: Stone = stones[i]
-		if await stone.assign_heritage() != "OK":
-			break
-		place_stones()
-		lying_stones[i]=[stone.heritage.number,stone.heritage.type]
-		stone.set_visible(true)
-	if Global.bag_rocks == []:
-		Global.bag_is_empty = true
+func update_stats()-> void:
+	var enemy: Enemy = BattleHandler.choosen_enemy
+	health_bar.value = player.stats.hp
+	health_label.text = str(player.stats.hp)
+	print(enemy.stats.hp)
+	if enemy != null:
+		enemy_health_label.text = str(enemy.stats.hp)
+		enemy_health_progress_bar.value = enemy.stats.hp
+	if player.dead:
+		battle_ended.emit()
+	if BattleHandler.choosen_enemy.dead:
+		battle_ended.emit()
