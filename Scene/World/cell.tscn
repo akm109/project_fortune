@@ -43,22 +43,31 @@ colors = PackedColorArray(0.517647, 0.909804, 0.482353, 0.552941)
 gradient = SubResource("Gradient_y38l7")
 
 [sub_resource type="LabelSettings" id="LabelSettings_ikhq8"]
+resource_local_to_scene = true
 
 [sub_resource type="LabelSettings" id="LabelSettings_t8g48"]
+resource_local_to_scene = true
 
 [sub_resource type="LabelSettings" id="LabelSettings_dhhbg"]
+resource_local_to_scene = true
 
 [sub_resource type="LabelSettings" id="LabelSettings_da78c"]
+resource_local_to_scene = true
 
 [sub_resource type="LabelSettings" id="LabelSettings_3nmn4"]
+resource_local_to_scene = true
 
 [sub_resource type="LabelSettings" id="LabelSettings_5scp3"]
+resource_local_to_scene = true
 
 [sub_resource type="LabelSettings" id="LabelSettings_ik28m"]
+resource_local_to_scene = true
 
 [sub_resource type="LabelSettings" id="LabelSettings_1dgeu"]
+resource_local_to_scene = true
 
 [sub_resource type="LabelSettings" id="LabelSettings_7ovbj"]
+resource_local_to_scene = true
 
 [sub_resource type="LabelSettings" id="LabelSettings_mbtmg"]
 resource_local_to_scene = true

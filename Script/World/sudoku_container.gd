@@ -3,24 +3,25 @@ extends GridContainer
 class_name Sudoku
 
 @onready var cell_path = SLib.globalize_path("res://Scene/World/cell.tscn")
+
 @onready var undo_timer: Timer = $UndoTimer
 @onready var undo_cooldown_timer: Timer = $UndoCooldownTimer
-@onready var timer: Timer = $Timer
+#@onready var timer: Timer = $Timer
 
 @export var difficulty: int = 50
-
-var true_solution:Array[Array]
-var solution:Array[Array]
-var reverse_solution:Array[Array]
-var reduced_solution:Array[Array]
-var cant_solve: Array[Array]
-var count: int
-var cells:Array[Control]
-var highlighted_hint: int
-var all_white: bool
-var shown_numbers: Array[Array]
-var undo_list: Array[Array] =[]
-var unlimited_undo: bool = false
+#Various types of solution for various purposes
+var true_solution:Array[Array]          # for perfect counter
+var solution:Array[Array]               # straight brute-force solution for finding correct problem
+var reverse_solution:Array[Array]       # gae solution brute-force for finding correct problem
+var reduced_solution:Array[Array]       # auxilary solution wwith holes
+var shown_numbers: Array[Array]         # what numbers do we show in UI
+#Cell related variables
+var cells:Array[Control]                # Array of cells wich contains hints and shown number
+var highlighted_hint: int               # What hint do we higlight righht now?
+var all_white: bool                     # Is there highlited cells?
+#Un_do related variables
+var undo_list: Array[Array] =[]         # List of actions that we can un_do
+var unlimited_undo: bool = false        # Should we start fast un_do?
 
 
 func _ready()-> void:
@@ -120,10 +121,15 @@ func un_do():
 		hint.set_visible(to_hide)
 		if Global.choosen_hint == hint_numb:
 			hint.label_settings.set_font_color(Color.RED)
+			hint.label_settings.set_font_size(24)
 			cell.back.set_color(Color(0.7, 0.95, 1.0))
 		else:
 			hint.label_settings.set_font_color(Color.BLACK)
-			cell.back.set_color(Color.WHITE)
+			hint.label_settings.set_font_size(16)
+		if not to_hide:
+			if Global.choosen_hint == hint_numb:
+				cell.back.set_color(Color.WHITE)
+		print("")
 
 
 func _on_undo_timer_timeout() -> void:
@@ -197,14 +203,11 @@ func get_prepared_problem()-> void:
 func generate_problem()-> void:
 	solution.resize(9)
 	reduced_solution.resize(9)
-	cant_solve.resize(9)
 	for row in range(9):
-		cant_solve[row].resize(9)
 		reduced_solution[row].resize(9)
 		solution[row].resize(9)
 		for col in range(9):
 			solution[row][col] = 0
-			cant_solve[row][col] = false
 	rand_solve()
 	reduced_solution = solution.duplicate(true)
 	true_solution = solution.duplicate(true)
